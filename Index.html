@@ -199,13 +199,67 @@
       .tables .table-header{grid-template-columns:minmax(0,1fr) auto}
       .tables .table-header .muted-btn{font-size:11px;padding:8px}
     }
+
+    /* V4: chibi thay emoji crest, cân chỉnh đôi cột và giá áo đỏ đậm */
+    .hero .crest{
+      flex:0 0 auto;width:clamp(90px,11vw,150px);height:clamp(90px,11vw,150px);
+      display:flex;align-items:center;justify-content:center;overflow:hidden;
+      border:1px solid rgba(255,255,255,.28);border-radius:22px;
+      background:rgba(255,255,255,.12);font-size:0
+    }
+    .hero .crest img{width:100%;height:100%;object-fit:contain;object-position:center bottom;
+      filter:drop-shadow(0 5px 8px rgba(0,0,0,.13))}
+    .hero .crest img[hidden],.hero .crest .crest-fallback[hidden]{display:none}
+    .hero .crest .crest-fallback{font-size:clamp(36px,5vw,60px)}
+    .jersey-layout{
+      grid-template-columns:minmax(0,1fr) minmax(0,1.85fr);
+      gap:clamp(14px,1.8vw,23px);
+      align-items:stretch
+    }
+    .jersey-photo{
+      display:flex;flex-direction:column;height:100%;align-self:stretch;
+      background:linear-gradient(160deg,#f5fbff,#edf5ff)
+    }
+    .jersey-photo>img{
+      display:block;width:100%;height:auto;min-height:0;
+      flex:1 1 0;object-fit:contain;object-position:center center
+    }
+    .jersey-photo .jersey-caption{flex:0 0 auto;margin-top:auto;background:#eef6ff}
+    .jersey-photo .price{color:#a8092c;font-weight:900;
+      font-size:clamp(19px,2.3vw,27px);line-height:1.4;
+      text-shadow:0 1px 0 rgba(255,255,255,.75)}
+    .jersey-details{min-width:0;display:flex;flex-direction:column;justify-content:space-between}
+    .size-guide{padding:12px 14px 10px}
+    .size-chart th,.size-chart td{padding:7px 5px}
+    .size-picker{margin-top:13px}
+    .jersey-fields{margin-top:12px}
+    @media(max-width:920px) and (min-width:701px){
+      .jersey-layout{grid-template-columns:minmax(0,1fr) minmax(0,1.65fr);gap:13px}
+      .size-guide{padding:11px}
+    }
+    @media(max-width:700px){
+      .jersey-layout{grid-template-columns:1fr;gap:16px}
+      .jersey-photo{height:auto;width:min(100%,420px);margin:0 auto}
+      .jersey-photo>img{height:auto;flex:none}
+      .jersey-details{display:block}
+    }
+    @media(max-width:430px){
+      .hero .crest{width:76px;height:76px;border-radius:15px}
+      .hero{gap:10px}
+      .jersey-photo .price{font-size:21px}
+    }
+
 </style>
 </head>
 <body>
   <div class="container">
     <header class="hero">
       <div><span class="tag">LỚP 2/12 · NGÀY HỘI THỂ THAO</span><h1>ĐĂNG KÝ BÓNG ĐÁ & ÁO ĐẤU</h1><p>Thi đấu hết mình · Cổ vũ nhiệt tình</p></div>
-      <div class="crest" aria-hidden="true">⚽</div>
+      <div class="crest" aria-hidden="true">
+        <img src="<?!= crestImage ?>" alt="" width="140" height="140" loading="eager" decoding="async"
+             onerror="this.hidden=true;this.nextElementSibling.hidden=false;">
+        <span class="crest-fallback" hidden>⚽</span>
+      </div>
     </header>
 
     <section class="stats" aria-label="Thống kê">
@@ -338,7 +392,8 @@
   function renderChart(chart){
     $('sizeButtons').innerHTML=chart.filter(x=>x.available).map(x=>
       '<button type="button" class="size-btn" aria-pressed="false" data-size="'+esc(x.size)+'">'+esc(x.size)+'</button>').join('');
-    $('sizeRows').innerHTML=chart.filter(x=>x.available).map(x=>
+    // Bảng tham khảo chỉ hiện size có số đo thực tế; size 8 vẫn có thể được chọn đặt áo.
+    $('sizeRows').innerHTML=chart.filter(x=>x.available && x.weight!=='—').map(x=>
       '<tr class="'+(x.available?'':'unavailable')+'"><td>'+esc(x.size)+(x.available?'':' *')+'</td><td>'+esc(x.weight)+'</td><td>'+esc(x.length)+'</td><td>'+esc(x.chest)+'</td></tr>').join('');
     $('sizeButtons').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>setSize(b.dataset.size)));
   }

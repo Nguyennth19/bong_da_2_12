@@ -10,6 +10,7 @@ const CFG = Object.freeze({
   athleteSheet: 'DS_THI_DAU',
   jerseySheet: 'DS_DAT_AO',
   jerseyImageId: '1ZRsAJOUB4ASQ6DFMd-pW0lNhWVC5UD93',
+  crestImageId: '1fwefzqlmTwvp3Rc5R7CGX-9IUZCfWTbA',
   sizeImageId: '19FmCI4RBG1WGtMCtg-ZmfUs1Ae8EH_6N',
   shirtPrice: 147000,
   availableSizes: ['5','7','8','11','13'],
@@ -31,6 +32,7 @@ const SIZE_CHART = [
 function doGet() {
   const tpl=HtmlService.createTemplateFromFile('Index');
   tpl.jerseyImage = imageDataUri_(CFG.jerseyImageId);
+  tpl.crestImage = imageDataUri_(CFG.crestImageId, 5 * 1024 * 1024);
   tpl.sizeImage = imageDataUri_(CFG.sizeImageId);
   return tpl.evaluate()
     .setTitle('Đăng ký bóng đá 2/12')
@@ -267,14 +269,16 @@ function digest_(token) {
 /**
  * Nhúng ảnh Drive vào HTML dưới dạng base64 data URI; chỉ chấp nhận file ảnh.
  */
-function imageDataUri_(fileId) {
+function imageDataUri_(fileId, maxBytes) {
   try {
     const blob=DriveApp.getFileById(fileId).getBlob();
     let mime=String(blob.getContentType()||'').toLowerCase();
     if(mime==='image/jpg') mime='image/jpeg';
     if(!['image/jpeg','image/png','image/webp'].includes(mime)) throw new Error('Unsupported image type: '+mime);
     const bytes=blob.getBytes();
-    if(bytes.length>2*1024*1024) throw new Error('Image too large to embed.');
+    // Chibi PNG gốc ~3.6MB: cho phép tối đa 5MB, ảnh còn lại giữ 2MB.
+    const limit=maxBytes || 2*1024*1024;
+    if(bytes.length>limit) throw new Error('Image too large to embed ('+bytes.length+' bytes).');
     return 'data:'+mime+';base64,'+Utilities.base64Encode(bytes);
   } catch(error) {
     console.error('Unable to read embedded image '+fileId+': '+String(error));

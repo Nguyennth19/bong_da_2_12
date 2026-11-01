@@ -23,6 +23,14 @@ Giao diện dùng **Be Vietnam Pro** qua Google Fonts (fallback Arial khi offlin
 - Thêm viền trên có màu cho module 2 và khung xác nhận để đồng bộ hệ màu.
 - Không cần chạy lại `setupProject()` khi chỉ cập nhật Web App từ GitHub.
 
+## V4 — cập nhật hình ảnh và bố cục (01/11/2026)
+- Thay emoji quả bóng ở header bằng ảnh `boy-chibi.png` từ chính folder Drive của lớp (ID `1fwefzqlmTwvp3Rc5R7CGX-9IUZCfWTbA`).
+- Ảnh gốc PNG khoảng **3,57 MB**: backend dùng `imageDataUri_` để nhúng base64, tăng ngưỡng dung lượng riêng crest lên **5 MB** (không thay đổi giới hạn ảnh áo).
+- Bỏ **riêng dòng size 8** chưa có số đo khỏi bảng tham khảo. **Nút chọn size 8 vẫn được giữ**, theo cấu hình đăng ký trước đó; nếu size 8 không phải sản phẩm được bán, cần sửa thêm danh mục `availableSizes`.
+- Giá 147.000đ/bộ đổi thành đỏ đậm `#a8092c`.
+- Ở màn hình lớn, hai khung ảnh áo và thông số được kéo giãn theo cùng một chiều cao; khung bên phải hẹp hơn một chút và giảm khoảng trống. Ở màn hình nhỏ, hai khung xếp dọc.
+- `/exec` cần deploy phiên bản mới sau `clasp push`. Không có thay đổi cấu trúc dữ liệu Sheets.
+
 ## Nguồn dữ liệu
 - [Google Sheet DA_BONG_2_12](https://docs.google.com/spreadsheets/d/1hZc7Xvpy2jfBRZZF0o07msk6zc6TgZBst4PDrC4fdtk/edit), tab `DANH SACH HOC SINH` có 43 em vào thời điểm khảo sát.
 - [Ảnh áo đấu](https://drive.google.com/file/d/1ZRsAJOUB4ASQ6DFMd-pW0lNhWVC5UD93/view)
