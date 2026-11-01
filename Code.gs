@@ -85,7 +85,8 @@ function submitRegistration(input) {
     const rawNumber=String(input.number===undefined?'':input.number).trim();
     if(!/^(?:[0-9]|[1-9][0-9])$/.test(rawNumber)) throw new Error('Số áo cần là số từ 0 đến 99.');
     const number=String(Number(rawNumber));
-    const printName=String(input.printName||'').replace(/\s+/g,' ').trim();
+    // Không bắt buộc nhập tên trên áo; tự lấy tên lót + tên từ danh sách lớp.
+    const printName=String(input.printName||'').replace(/\s+/g,' ').trim() || suggestedPrintName_(student.name);
     if(printName.length<2 || printName.length>40 || /[<>\r\n]/.test(printName) || /^[=+@-]/.test(printName)) {
       throw new Error('Tên in áo cần 2–40 ký tự và không được bắt đầu bằng ký tự công thức.');
     }
@@ -112,7 +113,7 @@ function submitRegistration(input) {
     }
     rebuildSummaries_(ss);
     SpreadsheetApp.flush();
-    return {ok:true,studentName:student.name,editToken:token,lists:getPublicLists()};
+    return {ok:true,studentName:student.name,printName:printName,editToken:token,lists:getPublicLists()};
   } finally {
     lock.releaseLock();
   }
@@ -247,6 +248,12 @@ function writeSummary_(sh,headers,rows) {
   sh.setFrozenRows(1);
   sh.getRange(1,1,Math.max(1,rows.length+1),headers.length).setVerticalAlignment('middle');
   sh.autoResizeColumns(1,headers.length);
+}
+
+/** Tên in áo mặc định: bỏ họ đầu tiên, giữ nguyên dấu và tên lót. */
+function suggestedPrintName_(fullName) {
+  const parts=String(fullName||'').trim().split(/\s+/).filter(Boolean);
+  return parts.length>1 ? parts.slice(1).join(' ') : parts.join(' ');
 }
 
 function normalize_(s) {
