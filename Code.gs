@@ -168,6 +168,16 @@ function setupProject() {
   return 'OK — '+n+' học sinh; đã chuẩn bị các bảng đăng ký.';
 }
 
+/** Admin-only: run manually after editing rows in DANG_KY directly. */
+function refreshSummaries() {
+  assertSetup_();
+  const ss=SpreadsheetApp.openById(CFG.spreadsheetId);
+  rebuildSummaries_(ss);
+  SpreadsheetApp.flush();
+  const lists=getPublicLists();
+  return {athletes:lists.athletes.length,jerseys:lists.orders.length};
+}
+
 function assertSetup_() {
   const ss=SpreadsheetApp.openById(CFG.spreadsheetId);
   if(!ss.getSheetByName(CFG.registrationSheet)) {
