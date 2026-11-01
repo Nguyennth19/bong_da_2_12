@@ -22,6 +22,22 @@
 - [ ] Không còn nút “Cập nhật hai danh sách”; sau khi lưu, danh sách và thống kê cập nhật ngay.
 - [ ] Bảng thi đấu và bảng đặt áo vẫn xếp theo tên gọi A–Z và đánh lại STT.
 
+## V6 — nguồn ảnh, checkbox và hai nút
+- [ ] `DANG_KY!A2:S10` có đúng 9 bản ghi; mỗi hàng khớp đúng một STUDENT_ID gốc.
+- [ ] `DS_THI_DAU` có 7 bé; `DS_DAT_AO` có 8 đơn; không có Gia Minh chưa rõ số áo trong hai danh sách in.
+- [ ] `Lê Chấn Hưng` thuộc `Cổ vũ` và chỉ có trong đơn áo, số áo 7 size 7.
+- [ ] Bốn hồ sơ size 9 (Trí Khang, Minh Khang, Khánh Minh, Minh Quang) cùng Henry Hải là size 9; có nút chọn size 9.
+- [ ] Gia Minh được lưu size 7, số áo trống, vai trò `Chờ xác nhận`, có ghi chú nguồn ảnh.
+- [ ] Checkbox K=PAYMENT_REPORTED và M=PAID có dataValidation BOOLEAN; không hồ sơ nhập ảnh nào được đánh dấu đã thu trước khi đối soát.
+- [ ] Khối thu quỹ xuất hiện sau form học sinh/áo, trước hai nút xác nhận.
+- [ ] Thuê sân tập và ăn nhẹ: 1.000.000đ/buổi, dự kiến 2; thi đấu nước/ăn nhẹ: 300.000đ/trận, tối thiểu 3.
+- [ ] Hai nút Xác nhận đăng ký / Xác nhận đã đóng tiền cùng một hàng desktop, màu khác nhau, mỗi nút có chú thích riêng.
+- [ ] Nhấn nút đóng tiền: chỉ thay cột K:L (báo đã chuyển), **không** thay cột M hoặc số tiền đã thu.
+- [ ] Phụ huynh đã báo lại không tạo thêm dòng hay ghi đè lịch sử.
+- [ ] Khi BQT tick M, trigger ghi ngày giờ N nếu được cài; admin không phải nhập lại đăng ký.
+- [ ] `setupProject()` không bị chạy tự động khi cập nhật V6.
+- [ ] Không nhân bản 9 hồ sơ khi đồng bộ `clasp push`.
+
 ## V5 — acceptance test quỹ và ảnh mới
 - [ ] Module thu quỹ nằm **sau hero** và **trước ba ô thống kê**, layout hai cột desktop, một cột mobile.
 - [ ] Phí thi đấu dự kiến **400.000đ/bé**, áo **150.000đ/bộ**, sân/ăn/uống **100.000đ/buổi**, ghi chú hoàn dư/quà rõ ràng.
