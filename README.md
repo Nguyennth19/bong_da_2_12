@@ -42,6 +42,19 @@ Giao diện dùng **Be Vietnam Pro** qua Google Fonts (fallback Arial khi offlin
 - Giữ nguyên source học sinh, các tab trong Sheets và quyền dữ liệu. Không chạy lại `setupProject()` khi chỉ cập nhật GitHub.
 - Khi thay file ảnh Drive bằng **file ID mới**, cần cập nhật `CFG.crestImageId` hoặc `CFG.paymentQrImageId` trong `Code.gs`. Nếu thay nội dung ngay trên cùng ID thì không cần sửa ID.
 
+## V6 — nhập đăng ký từ ảnh, cập nhật quỹ và theo dõi thu tiền
+- Đã nhập trực tiếp **9 học sinh** từ ảnh nhóm phụ huynh vào `DANG_KY` của Sheet hiện tại, khớp các `STUDENT_ID` trong danh sách gốc; không thay đổi danh sách học sinh.
+- **7 học sinh Thi đấu** vào `DS_THI_DAU` và **8 đơn áo đủ thông tin** vào `DS_DAT_AO`. `Lâm Gia Minh` đang ở trạng thái `Chờ xác nhận` vì ảnh không nêu số áo và chưa xác định Thi đấu hay Cổ vũ; không xuất vào danh sách in cho đến khi BQT bổ sung và chạy `refreshSummaries()`.
+- `Lê Chấn Hưng` là **Cổ vũ**, do đó có trong danh sách đặt áo nhưng không có trong danh sách thi đấu.
+- Bổ sung size **9**, giữ size 8 trước đó. Size 9 có số đo theo ảnh nhà cung cấp: 30 kg, dài áo 56 cm, vòng ngực 82 cm.
+- Khối thông tin quỹ nay nằm **sau phần học sinh/áo đấu và trước hàng nút xác nhận**. Thuê sân tập/ăn nhẹ/nước uống **1.000.000đ/buổi (dự kiến 2 buổi)**; thi đấu nước uống/ăn nhẹ **300.000đ/trận (dự kiến tối thiểu 3 trận)**. Mức dự kiến đóng theo diện Thi đấu **400.000đ/bé**, Cổ vũ **150.000đ/bộ áo**, chưa phải quyết toán.
+- Hai nút đặt cạnh nhau: **Xác nhận đăng ký** (lưu/điều chỉnh đăng ký) và **Xác nhận đã đóng tiền** (phụ huynh **báo chuyển khoản**, không xác minh ngân hàng).
+- Cột `K` (`PAYMENT_REPORTED`) là checkbox **phụ huynh báo chuyển khoản**; cột `M` (`PAID`) là checkbox **ban tổ chức đã kiểm tra thực nhận**; không tự đánh dấu `PAID=TRUE` từ nút của phụ huynh.
+- Thêm các cột L `PAYMENT_REPORTED_AT`, N `PAID_AT`, O `PAID_AMOUNT`, P `PAID_METHOD`, Q `PAID_NOTE`, R `IMPORT_NOTE`, S `EXPECTED_PAYMENT`. Trạng thái thực nhận của 9 hồ sơ nhập ảnh mặc định **chưa xác minh (FALSE)**. BQT có thể nhập số tiền thực nhận, ghi chú và phương thức tại Sheet.
+- Sau khi đồng bộ mã `clasp push`, chạy **`upgradePaymentTracking()`** một lần nếu muốn cài lại validation khi đổi file. Để tự ghi ngày giờ khi BQT tick `PAID`, chạy **`installPaymentEditTrigger()`** một lần bằng tài khoản quản trị và cấp quyền; trigger này *không* tự đánh dấu đã thu.
+- Các hồ sơ nhập ảnh được khóa cập nhật qua Web App nếu không có mã sửa trên trình duyệt; BQT điều chỉnh ở tab `DANG_KY` rồi chạy `refreshSummaries()`. Các nút thông báo chuyển khoản chỉ thay đổi `PAYMENT_REPORTED`, không thay đổi `PAID`.
+- Không chạy lại `setupProject()` chỉ để đồng bộ giao diện. Không cần nhập lại 9 hồ sơ; tránh nhân bản.
+
 ## Nguồn dữ liệu
 - [Google Sheet DA_BONG_2_12](https://docs.google.com/spreadsheets/d/1hZc7Xvpy2jfBRZZF0o07msk6zc6TgZBst4PDrC4fdtk/edit), tab `DANH SACH HOC SINH` có 43 em vào thời điểm khảo sát.
 - [Ảnh áo đấu](https://drive.google.com/file/d/1ZRsAJOUB4ASQ6DFMd-pW0lNhWVC5UD93/view)
@@ -49,7 +62,7 @@ Giao diện dùng **Be Vietnam Pro** qua Google Fonts (fallback Arial khi offlin
 - [Ảnh QR gốc](https://drive.google.com/file/d/1qHIar0aRKqAmg9v4OllzPYeWQ-n9jguz/view)
 - [Bảng size ảnh gốc](https://drive.google.com/file/d/19FmCI4RBG1WGtMCtg-ZmfUs1Ae8EH_6N/view)
 
-Giá quảng cáo gốc của nhà cung cấp **147.000đ/bộ**, nhưng phí thu theo chương trình đã chốt là **150.000đ/bộ**; ảnh nhà cung cấp ghi size 5, 7, 9, 11, 13. Giao diện hiện triển khai theo lựa chọn mới 5, 7, 8, 11, 13; thông số size 8 còn chờ xác nhận từ nhà cung cấp, không suy đoán.
+Giá quảng cáo gốc của nhà cung cấp **147.000đ/bộ**, nhưng phí thu theo chương trình đã chốt là **150.000đ/bộ**; ảnh nhà cung cấp ghi size 5, 7, 9, 11, 13. Giao diện hiện có các lựa chọn 5, 7, 8, 9, 11, 13; thông số size 8 còn chờ xác nhận từ nhà cung cấp, không suy đoán.
 
 ## Cấu trúc mã nguồn
 - `Code.gs`: kiểm tra dữ liệu, tìm tên không dấu, lưu một bản ghi / học sinh, kiểm soát số áo trùng ở nhóm Thi đấu, tạo bảng in.
@@ -84,7 +97,7 @@ Sau mỗi lần cập nhật source, **Manage deployments → Edit → New versi
 | Tab | Chức năng |
 | --- | --- |
 | `DANH SACH HOC SINH` | A: STT; B: họ tên; C: mã học sinh tạo một lần |
-| `DANG_KY` | Dữ liệu đăng ký chính; mật mã sửa được lưu dưới dạng SHA-256 |
+| `DANG_KY` | Dữ liệu đăng ký chính (A:J), báo chuyển khoản (K:L), đã thu thực tế (M:Q), nhập từ ảnh (R), tạm thu dự kiến (S) |
 | `DS_THI_DAU` | STT, họ tên, số áo; chỉ các em Thi đấu |
 | `DS_DAT_AO` | STT, họ tên, tên in áo, size, số áo, vai trò; cả Thi đấu và Cổ vũ |
 

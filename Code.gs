@@ -14,18 +14,21 @@ const CFG = Object.freeze({
   sizeImageId: '19FmCI4RBG1WGtMCtg-ZmfUs1Ae8EH_6N',
   paymentQrImageId: '1qHIar0aRKqAmg9v4OllzPYeWQ-n9jguz',
   shirtPrice: 150000,
-  availableSizes: ['5','7','8','11','13'],
+  availableSizes: ['5','7','8','9','11','13'],
   allowedRoles: ['Thi đấu','Cổ vũ']
 });
 const REG_HEADERS = [
   'STUDENT_ID','HO_TEN','VAI_TRO','SIZE_AO','SO_AO',
-  'TEN_IN_AO','DON_GIA_VND','TAO_LUC','CAP_NHAT_LUC','EDIT_TOKEN_HASH'
+  'TEN_IN_AO','DON_GIA_VND','TAO_LUC','CAP_NHAT_LUC','EDIT_TOKEN_HASH',
+  'PAYMENT_REPORTED','PAYMENT_REPORTED_AT','PAID','PAID_AT',
+  'PAID_AMOUNT','PAID_METHOD','PAID_NOTE','IMPORT_NOTE','EXPECTED_PAYMENT'
 ];
 const SIZE_CHART = [
   {size:'5', weight:'20 kg', length:'52 cm', chest:'74 cm'},
   {size:'7', weight:'25 kg', length:'54 cm', chest:'78 cm'},
   // Size 8 chưa có số đo trong ảnh từ nhà cung cấp; không lấy số đo của size 9.
   {size:'8', weight:'—', length:'—', chest:'—'},
+  {size:'9', weight:'30 kg', length:'56 cm', chest:'82 cm'},
   {size:'11',weight:'35 kg', length:'58 cm', chest:'86 cm'},
   {size:'13',weight:'40–45 kg',length:'60 cm',chest:'90 cm'}
 ];
@@ -71,7 +74,7 @@ function getMyRegistration(studentId,token) {
   if(!token || digest_(token)!==row.hash) return {exists:true,editable:false};
   return {exists:true,editable:true,registration:{
     studentId:row.id,role:row.role,size:row.size,
-    number:row.number,printName:row.printName
+    number:row.number,printName:row.printName,paymentReported:row.paymentReported,paid:row.paid
   }};
 }
 
@@ -108,9 +111,19 @@ function submitRegistration(input) {
     }
     const token=existing ? String(input.editToken) : Utilities.getUuid().replace(/-/g,'')+Utilities.getUuid().replace(/-/g,'');
     const now=new Date();
+    // Giữ trạng thái thanh toán khi chỉnh sửa đăng ký; không cho người dùng đổi PAID.
     const values=[
       id,student.name,role,size,number,printName,CFG.shirtPrice,
-      existing ? existing.createdAt : now,now,digest_(token)
+      existing ? existing.createdAt : now,now,digest_(token),
+      existing ? existing.paymentReported : false,
+      existing ? existing.paymentReportedAt : '',
+      existing ? existing.paid : false,
+      existing ? existing.paidAt : '',
+      existing ? existing.paidAmount : '',
+      existing ? existing.paidMethod : '',
+      existing ? existing.paidNote : '',
+      existing ? existing.importNote : '',
+      role==='Cổ vũ'?150000:400000
     ];
     if(existing) {
       sh.getRange(existing.sheetRow,1,1,REG_HEADERS.length).setValues([values]);
@@ -125,6 +138,70 @@ function submitRegistration(input) {
   }
 }
 
+/**
+ * Phụ huynh BÁO đã chuyển khoản, không phải xác nhận ngân hàng đã nhận tiền.
+ * Với dữ liệu cũ nhập từ ảnh, không có edit-token; xác thực mức cơ bản bằng số áo.
+ * Không trả về hoặc thay đổi cột PAID do ban tổ chức quản lý.
+ */
+function submitPaymentReport(input) {
+  assertSetup_();
+  if (!input || typeof input!=='object') throw new Error('Thiếu thông tin.');
+  const lock=LockService.getScriptLock();
+  if(!lock.tryLock(20000)) throw new Error('Hệ thống đang bận, vui lòng thử lại.');
+  try {
+    const id=String(input.studentId||'').trim();
+    const enteredNumber=String(input.number===undefined?'':input.number).trim();
+    const student=readStudents_().find(x=>x.id===id);
+    if(!student) throw new Error('Không tìm thấy học sinh.');
+    const sheet=SpreadsheetApp.openById(CFG.spreadsheetId).getSheetByName(CFG.registrationSheet);
+    const rec=readRegistrations_(sheet).find(x=>x.id===id);
+    if(!rec) throw new Error('Vui lòng xác nhận đăng ký trước khi thông báo chuyển khoản.');
+    if(!enteredNumber || rec.number==='' || Number(enteredNumber)!==Number(rec.number)) {
+      throw new Error('Số áo không khớp đăng ký. Vui lòng kiểm tra hoặc liên hệ ban tổ chức.');
+    }
+    if(rec.paid) return {ok:true,verified:true,message:'Ban tổ chức đã xác nhận nhận tiền.'};
+    if(rec.paymentReported) return {ok:true,verified:false,message:'Đã ghi nhận thông báo trước đó. Ban tổ chức sẽ đối soát.'};
+    sheet.getRange(rec.sheetRow,11,1,2).setValues([[true,new Date()]]);
+    SpreadsheetApp.flush();
+    return {ok:true,verified:false,message:'Đã ghi nhận thông báo chuyển khoản, chờ ban tổ chức đối soát.'};
+  } finally { lock.releaseLock(); }
+}
+
+/**
+ * Có thể chạy thủ công 1 lần nếu triển khai trên project standalone,
+ * tạo trigger để ghi PAID_AT khi BQT trực tiếp đánh dấu ô PAID.
+ */
+function installPaymentEditTrigger() {
+  const ss=SpreadsheetApp.openById(CFG.spreadsheetId);
+  const exists=ScriptApp.getProjectTriggers().some(t=>t.getHandlerFunction()==='handlePaymentEdit_');
+  if(!exists) ScriptApp.newTrigger('handlePaymentEdit_').forSpreadsheet(ss).onEdit().create();
+  return 'OK';
+}
+
+function handlePaymentEdit_(e) {
+  if(!e || !e.range || e.range.getSheet().getName()!==CFG.registrationSheet) return;
+  const sh=e.range.getSheet();
+  const row=e.range.getRow(),col=e.range.getColumn();
+  if(row<2 || col!==13 || e.range.getNumRows()!==1 || e.range.getNumColumns()!==1) return;
+  const checked=sh.getRange(row,13).getValue()===true;
+  sh.getRange(row,14).setValue(checked?new Date():'');
+}
+
+/** Chạy được lặp lại, chỉ bổ sung các cột thanh toán và checkbox mà không xóa dữ liệu cũ. */
+function upgradePaymentTracking() {
+  const ss=SpreadsheetApp.openById(CFG.spreadsheetId);
+  const sh=ensureSheet_(ss,CFG.registrationSheet,REG_HEADERS);
+  sh.getRange('K1:S1').setFontWeight('bold').setBackground('#17446f').setFontColor('#ffffff');
+  const n=sh.getMaxRows()-1;
+  const checkbox=SpreadsheetApp.newDataValidation().requireCheckbox().setAllowInvalid(false).build();
+  sh.getRange(2,11,n,1).setDataValidation(checkbox);
+  sh.getRange(2,13,n,1).setDataValidation(checkbox);
+  sh.setColumnWidth(18,340);
+  sh.setColumnWidth(17,250);
+  sh.setColumnWidth(19,145);
+  return 'Đã bổ sung 9 cột thanh toán. PAID do BQT đánh dấu, PAYMENT_REPORTED là tự khai.';
+}
+
 /** Public lists show registrants, not the full underlying student roster. */
 function getPublicLists() {
   assertSetup_();
@@ -134,7 +211,8 @@ function getPublicLists() {
   const athletes=sorted.filter(r=>r.role==='Thi đấu').map((r,i)=>({
     stt:i+1,name:r.name,number:r.number
   }));
-  const orders=sorted.map((r,i)=>({
+  // Hồ sơ chưa xác nhận vai trò hoặc số áo nằm trong DANG_KY, không in đơn thiếu thông tin.
+  const orders=sorted.filter(r=>CFG.allowedRoles.includes(r.role) && r.number!=='').map((r,i)=>({
     stt:i+1,name:r.name,printName:r.printName,size:r.size,
     number:r.number,role:r.role
   }));
@@ -167,6 +245,7 @@ function setupProject() {
   }
   const reg=ensureSheet_(ss,CFG.registrationSheet,REG_HEADERS);
   reg.getRange('E:E').setNumberFormat('@');
+  upgradePaymentTracking();
   reg.setFrozenRows(1);
   ensureSheet_(ss,CFG.athleteSheet,['STT','HỌ VÀ TÊN','SỐ ÁO']);
   ensureSheet_(ss,CFG.jerseySheet,['STT','HỌ VÀ TÊN','TÊN IN ÁO','SIZE','SỐ ÁO','HÌNH THỨC']);
@@ -196,7 +275,9 @@ function ensureSheet_(ss,name,headers) {
   let sh=ss.getSheetByName(name);
   if(!sh) sh=ss.insertSheet(name);
   const first=sh.getRange(1,1,1,headers.length).getDisplayValues()[0];
-  if(first.some(x=>String(x).trim()) && first.join('|')!==headers.join('|')) {
+  // Cho phép nâng cấp từ schema 10 cột sang schema mới mà vẫn giữ toàn bộ dữ liệu.
+  const existingCount=first.filter(x=>String(x).trim()).length;
+  if(existingCount && first.slice(0,existingCount).join('|')!==headers.slice(0,existingCount).join('|')) {
     throw new Error('Tab '+name+' có tiêu đề khác cấu hình. Dừng để tránh ghi đè.');
   }
   sh.getRange(1,1,1,headers.length).setValues([headers]);
@@ -222,7 +303,11 @@ function readRegistrations_(sh) {
       sheetRow:i+2,id:String(r[0]||''),name:String(r[1]||''),
       role:String(r[2]||''),size:String(r[3]||''),
       number:String(r[4]||''),printName:String(r[5]||''),
-      createdAt:r[7],hash:String(r[9]||'')
+      createdAt:r[7],hash:String(r[9]||''),
+      paymentReported:r[10]===true,paymentReportedAt:r[11]||'',
+      paid:r[12]===true,paidAt:r[13]||'',paidAmount:r[14]||'',
+      paidMethod:String(r[15]||''),paidNote:String(r[16]||''),
+      importNote:String(r[17]||''),expectedPayment:r[18]||''
     })).filter(r=>r.id);
 }
 
@@ -241,7 +326,8 @@ function compareStudentNames_(a,b) {
 function rebuildSummaries_(ss) {
   const all=readRegistrations_(ss.getSheetByName(CFG.registrationSheet)).sort(compareStudentNames_);
   const athletes=all.filter(x=>x.role==='Thi đấu').map((x,i)=>[i+1,x.name,x.number]);
-  const jerseys=all.map((x,i)=>[i+1,x.name,x.printName,x.size,x.number,x.role]);
+  const jerseys=all.filter(x=>CFG.allowedRoles.includes(x.role) && x.number!=='')
+    .map((x,i)=>[i+1,x.name,x.printName,x.size,x.number,x.role]);
   writeSummary_(ss.getSheetByName(CFG.athleteSheet),['STT','HỌ VÀ TÊN','SỐ ÁO'],athletes);
   writeSummary_(ss.getSheetByName(CFG.jerseySheet),['STT','HỌ VÀ TÊN','TÊN IN ÁO','SIZE','SỐ ÁO','HÌNH THỨC'],jerseys);
 }
