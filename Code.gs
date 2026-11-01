@@ -9,6 +9,7 @@ const CFG = Object.freeze({
   registrationSheet: 'DANG_KY',
   athleteSheet: 'DS_THI_DAU',
   jerseySheet: 'DS_DAT_AO',
+  extraJerseySheet: 'AO_BO_SUNG',
   jerseyImageId: '1ZRsAJOUB4ASQ6DFMd-pW0lNhWVC5UD93',
   crestImageId: '1hK0oAl1M_yHtrUjsUGHVJSY9UQ7kWqQz',
   sizeImageId: '19FmCI4RBG1WGtMCtg-ZmfUs1Ae8EH_6N',
@@ -23,6 +24,11 @@ const REG_HEADERS = [
   'PAYMENT_REPORTED','PAYMENT_REPORTED_AT','PAID','PAID_AT',
   'PAID_AMOUNT','PAID_METHOD','PAID_NOTE','IMPORT_NOTE','EXPECTED_PAYMENT'
 ];
+const EXTRA_HEADERS = [
+  'ORDER_ID','STUDENT_ID','HO_TEN','TEN_IN_AO','SIZE','SO_AO',
+  'VAI_TRO','PAID','GHI_CHU','SO_LUONG','DON_GIA_VND'
+];
+const ORDER_HEADERS = ['STT','HỌ VÀ TÊN','TÊN IN ÁO','SIZE','SỐ ÁO','HÌNH THỨC','ĐÃ ĐÓNG TIỀN'];
 const SIZE_CHART = [
   {size:'5', weight:'20 kg', length:'52 cm', chest:'74 cm'},
   {size:'7', weight:'25 kg', length:'54 cm', chest:'78 cm'},
@@ -128,7 +134,9 @@ function submitRegistration(input) {
     if(existing) {
       sh.getRange(existing.sheetRow,1,1,REG_HEADERS.length).setValues([values]);
     } else {
-      sh.getRange(sh.getLastRow()+1,1,1,REG_HEADERS.length).setValues([values]);
+      // Checkbox phủ sẵn toàn cột có thể khiến getLastRow() vượt khỏi dữ liệu thật.
+      const firstEmpty=rows.length?Math.max(...rows.map(r=>r.sheetRow))+1:2;
+      sh.getRange(firstEmpty,1,1,REG_HEADERS.length).setValues([values]);
     }
     rebuildSummaries_(ss);
     SpreadsheetApp.flush();
@@ -179,12 +187,17 @@ function installPaymentEditTrigger() {
 }
 
 function handlePaymentEdit_(e) {
-  if(!e || !e.range || e.range.getSheet().getName()!==CFG.registrationSheet) return;
-  const sh=e.range.getSheet();
+  if(!e || !e.range) return;
+  const sh=e.range.getSheet(),tab=sh.getName();
   const row=e.range.getRow(),col=e.range.getColumn();
-  if(row<2 || col!==13 || e.range.getNumRows()!==1 || e.range.getNumColumns()!==1) return;
-  const checked=sh.getRange(row,13).getValue()===true;
-  sh.getRange(row,14).setValue(checked?new Date():'');
+  if(row<2 || e.range.getNumRows()!==1 || e.range.getNumColumns()!==1) return;
+  if(tab===CFG.registrationSheet && col===13){
+    const checked=sh.getRange(row,13).getValue()===true;
+    sh.getRange(row,14).setValue(checked?new Date():'');
+  } else if(tab===CFG.extraJerseySheet && col===8){
+    // Checkbox của áo đặt thêm; không làm thay đổi payment của đăng ký chính.
+  } else return;
+  rebuildSummaries_(SpreadsheetApp.openById(CFG.spreadsheetId));
 }
 
 /** Chạy được lặp lại, chỉ bổ sung các cột thanh toán và checkbox mà không xóa dữ liệu cũ. */
@@ -203,20 +216,46 @@ function upgradePaymentTracking() {
 }
 
 /** Public lists show registrants, not the full underlying student roster. */
+/**
+ * Mỗi học sinh có một đăng ký chính, nhưng có thể có thêm áo bổ sung.
+ * Các áo ngoại lệ (người lớn) được ghi AO_BO_SUNG, không tự thêm vào roster.
+ */
+function collectLists_(ss) {
+  const main=readRegistrations_(ss.getSheetByName(CFG.registrationSheet)).sort(compareStudentNames_);
+  const athletes=main.filter(r=>r.role==='Thi đấu' && r.number!=='')
+    .map((r,i)=>({stt:i+1,name:r.name,number:r.number}));
+  const mainOrders=main.filter(r=>CFG.allowedRoles.includes(r.role) && r.size)
+    .map(r=>({name:r.name,printName:r.printName,size:r.size,number:r.number,
+      role:r.role,paid:r.paid,notes:'',orderId:'MAIN-'+r.id,studentId:r.id}));
+  const extraOrders=readExtraOrders_(ss.getSheetByName(CFG.extraJerseySheet))
+    .filter(r=>r.quantity>0)
+    .flatMap(r=>Array.from({length:r.quantity},(_,i)=>({
+      name:r.name,printName:r.printName,size:r.size,number:r.number,
+      role:r.role,paid:r.paid,notes:r.notes,
+      orderId:r.orderId+(r.quantity>1?'-'+(i+1):''),studentId:r.studentId
+    })));
+  const allOrders=mainOrders.concat(extraOrders).sort(compareStudentNames_);
+  return {athletes,orders:allOrders.map((r,i)=>({...r,stt:i+1}))};
+}
+
+function readExtraOrders_(sh) {
+  if(!sh || sh.getLastRow()<2)return [];
+  return sh.getRange(2,1,sh.getLastRow()-1,EXTRA_HEADERS.length).getValues()
+    .map((r,i)=>({sheetRow:i+2,orderId:String(r[0]||'').trim(),
+      studentId:String(r[1]||'').trim(),name:String(r[2]||'').trim(),
+      printName:String(r[3]||'').trim(),size:String(r[4]||'').trim(),
+      number:r[5]===null||r[5]===undefined?'':String(r[5]).trim(),
+      role:String(r[6]||'').trim(),paid:r[7]===true,
+      notes:String(r[8]||'').trim(),quantity:Number(r[9]||0),
+      price:Number(r[10]||0)}))
+    .filter(r=>r.orderId && r.name && CFG.allowedRoles.includes(r.role));
+}
+
 function getPublicLists() {
   assertSetup_();
   const ss=SpreadsheetApp.openById(CFG.spreadsheetId);
-  const entries=readRegistrations_(ss.getSheetByName(CFG.registrationSheet));
-  const sorted=entries.slice().sort(compareStudentNames_);
-  const athletes=sorted.filter(r=>r.role==='Thi đấu').map((r,i)=>({
-    stt:i+1,name:r.name,number:r.number
-  }));
-  // Hồ sơ chưa xác nhận vai trò hoặc số áo nằm trong DANG_KY, không in đơn thiếu thông tin.
-  const orders=sorted.filter(r=>CFG.allowedRoles.includes(r.role) && r.number!=='').map((r,i)=>({
-    stt:i+1,name:r.name,printName:r.printName,size:r.size,
-    number:r.number,role:r.role
-  }));
-  return {athletes,orders,updatedAt:new Date().toISOString()};
+  const lists=collectLists_(ss);
+  return {...lists,updatedAt:new Date().toISOString()};
 }
 
 /** Initialize registration tabs and immutable student IDs. Does not alter student names. */
@@ -248,7 +287,8 @@ function setupProject() {
   upgradePaymentTracking();
   reg.setFrozenRows(1);
   ensureSheet_(ss,CFG.athleteSheet,['STT','HỌ VÀ TÊN','SỐ ÁO']);
-  ensureSheet_(ss,CFG.jerseySheet,['STT','HỌ VÀ TÊN','TÊN IN ÁO','SIZE','SỐ ÁO','HÌNH THỨC']);
+  ensureSheet_(ss,CFG.jerseySheet,ORDER_HEADERS);
+  ensureSheet_(ss,CFG.extraJerseySheet,EXTRA_HEADERS);
   rebuildSummaries_(ss);
   SpreadsheetApp.flush();
   return 'OK — '+n+' học sinh; đã chuẩn bị các bảng đăng ký.';
@@ -324,12 +364,18 @@ function compareStudentNames_(a,b) {
 }
 
 function rebuildSummaries_(ss) {
-  const all=readRegistrations_(ss.getSheetByName(CFG.registrationSheet)).sort(compareStudentNames_);
-  const athletes=all.filter(x=>x.role==='Thi đấu').map((x,i)=>[i+1,x.name,x.number]);
-  const jerseys=all.filter(x=>CFG.allowedRoles.includes(x.role) && x.number!=='')
-    .map((x,i)=>[i+1,x.name,x.printName,x.size,x.number,x.role]);
+  const lists=collectLists_(ss);
+  const athletes=lists.athletes.map(x=>[x.stt,x.name,x.number]);
+  const jerseys=lists.orders.map(x=>[
+    x.stt,x.name,x.printName,x.size,x.number,x.role,x.paid?'✓':''
+  ]);
   writeSummary_(ss.getSheetByName(CFG.athleteSheet),['STT','HỌ VÀ TÊN','SỐ ÁO'],athletes);
-  writeSummary_(ss.getSheetByName(CFG.jerseySheet),['STT','HỌ VÀ TÊN','TÊN IN ÁO','SIZE','SỐ ÁO','HÌNH THỨC'],jerseys);
+  writeSummary_(ss.getSheetByName(CFG.jerseySheet),ORDER_HEADERS,jerseys);
+  const out=ss.getSheetByName(CFG.jerseySheet);
+  if(out && jerseys.length){
+    out.getRange(2,7,jerseys.length,1).setFontColor('#148454')
+      .setFontWeight('bold').setHorizontalAlignment('center');
+  }
 }
 
 function writeSummary_(sh,headers,rows) {
