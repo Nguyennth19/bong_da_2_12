@@ -15,7 +15,7 @@ const CFG = Object.freeze({
   sizeImageId: '19FmCI4RBG1WGtMCtg-ZmfUs1Ae8EH_6N',
   paymentQrImageId: '1qHIar0aRKqAmg9v4OllzPYeWQ-n9jguz',
   shirtPrice: 150000,
-  availableSizes: ['5','7','8','9','11','13'],
+  availableSizes: ['5','7','9','11','13'],
   allowedRoles: ['Thi đấu','Cổ vũ']
 });
 const REG_HEADERS = [
@@ -32,8 +32,6 @@ const ORDER_HEADERS = ['STT','HỌ VÀ TÊN','TÊN IN ÁO','SIZE','SỐ ÁO','H�
 const SIZE_CHART = [
   {size:'5', weight:'20 kg', length:'52 cm', chest:'74 cm'},
   {size:'7', weight:'25 kg', length:'54 cm', chest:'78 cm'},
-  // Size 8 chưa có số đo trong ảnh từ nhà cung cấp; không lấy số đo của size 9.
-  {size:'8', weight:'—', length:'—', chest:'—'},
   {size:'9', weight:'30 kg', length:'56 cm', chest:'82 cm'},
   {size:'11',weight:'35 kg', length:'58 cm', chest:'86 cm'},
   {size:'13',weight:'40–45 kg',length:'60 cm',chest:'90 cm'}
