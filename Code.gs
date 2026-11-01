@@ -171,11 +171,11 @@ function submitPaymentReport(input) {
     if(!enteredNumber || rec.number==='' || Number(enteredNumber)!==Number(rec.number)) {
       throw new Error('Số áo không khớp đăng ký. Vui lòng kiểm tra hoặc liên hệ ban tổ chức.');
     }
-    if(rec.paid) return {ok:true,verified:true,message:'Ban tổ chức đã xác nhận nhận tiền.'};
-    if(rec.paymentReported) return {ok:true,verified:false,message:'Đã ghi nhận thông báo trước đó. Ban tổ chức sẽ đối soát.'};
+    if(rec.paid) return {ok:true,verified:true,message:'Ban tổ chức đã xác nhận nhận tiền.',lists:getPublicLists()};
+    if(rec.paymentReported) return {ok:true,verified:false,message:'Đã ghi nhận thông báo trước đó. Ban tổ chức sẽ đối soát.',lists:getPublicLists()};
     sheet.getRange(rec.sheetRow,11,1,2).setValues([[true,new Date()]]);
     SpreadsheetApp.flush();
-    return {ok:true,verified:false,message:'Đã ghi nhận thông báo chuyển khoản, chờ ban tổ chức đối soát.'};
+    return {ok:true,verified:false,message:'Đã ghi nhận thông báo chuyển khoản, chờ ban tổ chức đối soát.',lists:getPublicLists()};
   } finally { lock.releaseLock(); }
 }
 
@@ -273,12 +273,12 @@ function collectLists_(ss) {
     .map((r,i)=>({...r,stt:i+1}));
   const mainOrders=main.filter(r=>CFG.allowedRoles.includes(r.role) && r.size)
     .map(r=>({name:r.name,printName:r.printName,size:r.size,number:r.number,
-      role:r.role,paid:r.paid,orderId:'MAIN-'+r.id,studentId:r.id}));
+      role:r.role,paid:r.paid,paymentReported:r.paymentReported,orderId:'MAIN-'+r.id,studentId:r.id}));
   const extraOrders=readExtraOrders_(ss.getSheetByName(CFG.extraJerseySheet))
     .filter(r=>r.quantity>0)
     .flatMap(r=>Array.from({length:r.quantity},(_,i)=>({
       name:r.name,printName:r.printName,size:r.size,number:r.number,
-      role:r.role,paid:r.paid,
+      role:r.role,paid:r.paid,paymentReported:false,
       orderId:r.orderId+(r.quantity>1?'-'+(i+1):''),studentId:r.studentId
     })));
   const allOrders=mainOrders.concat(extraOrders).sort(compareStudentNames_);
