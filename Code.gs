@@ -16,6 +16,8 @@ const CFG = Object.freeze({
   sizeImageId: '19FmCI4RBG1WGtMCtg-ZmfUs1Ae8EH_6N',
   paymentQrImageId: '1qHIar0aRKqAmg9v4OllzPYeWQ-n9jguz',
   shirtPrice: 150000,
+  athleteFee: 500000,
+  supporterFee: 150000,
   availableSizes: ['5','7','9','11','13'],
   allowedRoles: ['Thi đấu','Cổ vũ']
 });
@@ -131,7 +133,7 @@ function submitRegistration(input) {
       existing ? existing.paidMethod : '',
       existing ? existing.paidNote : '',
       existing ? existing.importNote : '',
-      (role==='Cổ vũ'?150000:400000)+extraCost
+      (role==='Cổ vũ'?CFG.supporterFee:CFG.athleteFee)+extraCost
     ];
     if(existing) {
       sh.getRange(existing.sheetRow,1,1,REG_HEADERS.length).setValues([values]);
@@ -280,7 +282,23 @@ function collectLists_(ss) {
       orderId:r.orderId+(r.quantity>1?'-'+(i+1):''),studentId:r.studentId
     })));
   const allOrders=mainOrders.concat(extraOrders).sort(compareStudentNames_);
-  return {athletes,orders:allOrders.map((r,i)=>({...r,stt:i+1}))};
+  // 'Xác nhận' chỉ tính cầu thủ đã đăng ký áo, không tính tên có trong giấy.
+  const registeredIds=new Set(main.filter(r=>r.size && r.number!=='').map(r=>r.id));
+  const confirmedAthletes=[...athleteById.keys()].filter(id=>registeredIds.has(id)).length;
+  // Người cổ vũ tính theo đơn áo (không bao gồm cầu thủ thi đấu).
+  const supporterOrders=allOrders.filter(r=>r.role==='Cổ vũ');
+  const plannedTotal=athletes.length*CFG.athleteFee+supporterOrders.length*CFG.supporterFee;
+  // Thu thực tế chỉ được tính khi BQT tick PAID, không dựa trên tự khai.
+  const collectedMain=main.filter(r=>r.paid).reduce((sum,r)=>
+    sum+(r.paidAmount>0?Number(r.paidAmount):(r.role==='Cổ vũ'?CFG.supporterFee:CFG.athleteFee)),0);
+  const collectedExtras=readExtraOrders_(ss.getSheetByName(CFG.extraJerseySheet))
+    .filter(r=>r.paid).reduce((sum,r)=>sum+(r.price*r.quantity),0);
+  return {
+    athletes,orders:allOrders.map((r,i)=>({...r,stt:i+1})),
+    stats:{athletes:athletes.length,confirmed:confirmedAthletes,
+      supporters:supporterOrders.length,shirts:allOrders.length,
+      plannedTotal,collectedTotal:collectedMain+collectedExtras}
+  };
 }
 
 function readExtraOrders_(sh) {
