@@ -305,6 +305,23 @@
       .payment-lead strong{font-size:26px}
     }
 
+
+    /* V6 - Thông tin thanh toán nằm sau áo đấu; hai hành động song song. */
+    .payment-module{margin-top:0;margin-bottom:20px}
+    .payment-fee .fee-sub{display:block;font-size:11px;font-weight:600;color:#677b93;margin-top:2px}
+    .payment-fee span{min-width:0;flex:1}
+    .payment-fee strong{text-align:right}
+    .confirm-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+    .confirm-action{display:flex;flex-direction:column;gap:6px;min-width:0}
+    .confirm-card .confirm-action .primary{display:block;width:100%;min-height:57px;font-size:clamp(14px,1.65vw,18px)}
+    .confirm-action .submit-help{text-align:center;margin:0;min-height:39px;font-weight:500}
+    .payment-confirm-btn{background:linear-gradient(115deg,#15a56e,#00a5a9)!important;box-shadow:0 7px 18px #18987635!important}
+    @media(max-width:430px){
+      .confirm-action-grid{gap:9px}
+      .confirm-card .confirm-action .primary{min-height:66px;padding:10px 8px;font-size:13px;line-height:1.4}
+      .confirm-action .submit-help{font-size:11px}
+      .payment-fee{align-items:flex-start}
+    }
 </style>
 </head>
 <body>
@@ -318,42 +335,6 @@
       </div>
     </header>
 
-
-    <!-- Quỹ bóng đá: 2 cột chi phí & chuyển khoản, ngay sau header. -->
-    <section class="card payment-module" aria-label="Thông tin thu quỹ và chuyển khoản">
-      <div class="payment-grid">
-        <div class="payment-panel payment-panel-fund">
-          <div class="payment-heading"><span class="payment-icon" aria-hidden="true">⚽</span><h2>Thông tin thu quỹ Bóng đá</h2></div>
-          <p class="payment-lead">Số tiền dự định thu <strong>400.000đ/bé</strong></p>
-          <div class="payment-fees">
-            <div class="payment-fee"><span>👕 Áo đấu</span><strong>150.000đ / bộ</strong></div>
-            <div class="payment-fee"><span>🏟️ Thuê sân, ăn nhẹ, nước uống</span><strong>100.000đ / buổi</strong></div>
-          </div>
-          <div class="payment-explain">
-            <p><span aria-hidden="true">✨</span> Khoản dư sau giải sẽ được hoàn trả hoặc mua quà kỷ niệm cho bé.</p>
-            <p><span aria-hidden="true">📣</span> Phụ huynh đăng ký áo đấu để <b>cổ vũ chỉ đóng 150.000đ / bộ.</b></p>
-          </div>
-        </div>
-
-        <div class="payment-panel payment-panel-bank">
-          <div class="payment-heading"><span class="payment-icon" aria-hidden="true">🏦</span><h2>Thông tin chuyển khoản</h2></div>
-          <div class="bank-facts">
-            <div><span class="bank-label">Tên tài khoản</span><strong><?= bankAccountName ?></strong></div>
-            <div><span class="bank-label">Số tài khoản</span><strong class="bank-number"><?= bankAccountNumber ?></strong></div>
-            <div><span class="bank-label">Ngân hàng</span><strong><?= bankName ?></strong></div>
-          </div>
-          <div class="bank-transfer-label">Nội dung chuyển khoản</div>
-          <div class="bank-reference" id="paymentReference" aria-live="polite">[Tên bé] - Lớp 2/12 - Đóng quỹ bóng đá</div>
-          <div class="payment-qr-area">
-            <img id="paymentQrSource" class="payment-qr-source" src="<?!= paymentQrImage ?>" alt="" aria-hidden="true">
-            <canvas id="paymentQrCanvas" class="payment-qr-canvas" width="924" height="1012" role="img"
-              aria-label="Mã QR VPBank để quét chuyển khoản"></canvas>
-            <p id="paymentQrError" class="payment-qr-error" hidden>Chưa thể hiển thị mã QR. Vui lòng chuyển khoản theo thông tin bên trên.</p>
-            <p class="payment-qr-caption">Quét mã QR để chuyển khoản</p>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <section class="stats" aria-label="Thống kê">
       <div class="stat"><b id="countAthletes">0</b><span>Bé tham gia thi đấu</span></div>
@@ -425,11 +406,55 @@
       </div>
     </section>
 
+    <!-- Quỹ bóng đá: 2 cột chi phí & chuyển khoản, ngay sau header. -->
+    <section class="card payment-module" aria-label="Thông tin thu quỹ và chuyển khoản">
+      <div class="payment-grid">
+        <div class="payment-panel payment-panel-fund">
+          <div class="payment-heading"><span class="payment-icon" aria-hidden="true">⚽</span><h2>Thông tin thu quỹ Bóng đá</h2></div>
+          <p class="payment-lead">Số tiền dự định thu <strong>400.000đ/bé</strong></p>
+          <div class="payment-fees">
+            <div class="payment-fee"><span>👕 Áo đấu</span><strong>150.000đ / bộ</strong></div>
+            <div class="payment-fee"><span>🏟️ Thuê sân tập, ăn nhẹ, nước uống<small class="fee-sub">Dự kiến 2 buổi tập</small></span><strong>1.000.000đ / buổi</strong></div>
+            <div class="payment-fee"><span>🏆 Thi đấu: nước uống, ăn nhẹ<small class="fee-sub">Dự kiến tối thiểu 3 trận</small></span><strong>300.000đ / trận</strong></div>
+          </div>
+          <div class="payment-explain">
+            <p><span aria-hidden="true">✨</span> Khoản dư sau giải sẽ được hoàn trả hoặc mua quà kỷ niệm cho bé.</p>
+            <p><span aria-hidden="true">📣</span> Phụ huynh đăng ký áo đấu để <b>cổ vũ chỉ đóng 150.000đ / bộ.</b></p>
+          </div>
+        </div>
+
+        <div class="payment-panel payment-panel-bank">
+          <div class="payment-heading"><span class="payment-icon" aria-hidden="true">🏦</span><h2>Thông tin chuyển khoản</h2></div>
+          <div class="bank-facts">
+            <div><span class="bank-label">Tên tài khoản</span><strong><?= bankAccountName ?></strong></div>
+            <div><span class="bank-label">Số tài khoản</span><strong class="bank-number"><?= bankAccountNumber ?></strong></div>
+            <div><span class="bank-label">Ngân hàng</span><strong><?= bankName ?></strong></div>
+          </div>
+          <div class="bank-transfer-label">Nội dung chuyển khoản</div>
+          <div class="bank-reference" id="paymentReference" aria-live="polite">[Tên bé] - Lớp 2/12 - Đóng quỹ bóng đá</div>
+          <div class="payment-qr-area">
+            <img id="paymentQrSource" class="payment-qr-source" src="<?!= paymentQrImage ?>" alt="" aria-hidden="true">
+            <canvas id="paymentQrCanvas" class="payment-qr-canvas" width="924" height="1012" role="img"
+              aria-label="Mã QR VPBank để quét chuyển khoản"></canvas>
+            <p id="paymentQrError" class="payment-qr-error" hidden>Chưa thể hiển thị mã QR. Vui lòng chuyển khoản theo thông tin bên trên.</p>
+            <p class="payment-qr-caption">Quét mã QR để chuyển khoản</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
     <!-- Module 3: full-width confirmation -->
-    <section class="confirm-card" id="module3" aria-label="Xác nhận đăng ký">
-      <div class="actions">
-        <button type="button" class="primary" id="submitBtn">✓ Xác nhận đăng ký</button>
-        <span class="submit-help" id="submissionHelp">Vui lòng chọn hình thức tham gia, tên bé, size và số áo.</span>
+    <section class="confirm-card" id="module3" aria-label="Xác nhận đăng ký và chuyển khoản">
+      <div class="confirm-action-grid">
+        <div class="confirm-action">
+          <button type="button" class="primary" id="submitBtn">✓ Xác nhận đăng ký</button>
+          <p class="submit-help" id="submissionHelp">Lưu lựa chọn thi đấu/cổ vũ, size và số áo.</p>
+        </div>
+        <div class="confirm-action">
+          <button type="button" class="primary payment-confirm-btn" id="paymentBtn">✓ Xác nhận đã đóng tiền</button>
+          <p class="submit-help" id="paymentHelp">Báo đã chuyển khoản; ban tổ chức sẽ kiểm tra và đánh dấu đã thu.</p>
+        </div>
       </div>
       <div id="message" class="notice offscreen" role="status" aria-live="polite"></div>
     </section>
@@ -503,7 +528,7 @@
   }
   function server(fn,args,onSuccess){
     let handler=google.script.run.withSuccessHandler(onSuccess).withFailureHandler(e=>{
-      busy=false;$('submitBtn').disabled=false;
+      busy=false;$('submitBtn').disabled=false;$('paymentBtn').disabled=false;
       message(e&&e.message?e.message:'Không thể kết nối. Vui lòng thử lại.','error');
     });
     handler[fn].apply(handler,args);
@@ -541,7 +566,9 @@
   function clearChosen(){
     selected=null;editToken='';$('selectedName').textContent='';updatePaymentReference('');
     $('printName').value='';$('jerseyNumber').value='';setSize('');
-    $('submitBtn').disabled=false;$('submissionHelp').textContent='Vui lòng chọn học sinh, vai trò, size và số áo.';
+    $('submitBtn').disabled=false;$('paymentBtn').disabled=false;
+    $('submissionHelp').textContent='Lưu lựa chọn thi đấu/cổ vũ, size và số áo.';
+    $('paymentHelp').textContent='Báo đã chuyển khoản; ban tổ chức sẽ kiểm tra và đánh dấu đã thu.';
   }
   function chooseStudent(s){
     selected=s;results=[];searchSequence++;clearTimeout(searchTimer);$('suggestions').innerHTML='';$('studentSearch').value=s.name;
@@ -553,11 +580,14 @@
       if(!selected||selected.id!==s.id) return;
       if(response.exists&&!response.editable){
         $('submitBtn').disabled=true;
-        $('submissionHelp').textContent='Đã có đăng ký từ thiết bị khác. Liên hệ ban tổ chức để điều chỉnh.';
-        message('Học sinh này đã đăng ký. Để bảo vệ dữ liệu, thiết bị không có mã sửa không thể ghi đè.','error');
+        $('submissionHelp').textContent='Bé đã đăng ký. Liên hệ ban tổ chức nếu cần chỉnh thông tin.';
+        // Cho phép báo chuyển khoản bằng số áo đã đăng ký; KHÔNG tự đánh dấu PAID.
+        $('paymentHelp').textContent='Nhập số áo đã đăng ký rồi nhấn thông báo chuyển khoản.';
+        message('Bé đã có trong danh sách. Thông tin chỉnh sửa cần liên hệ ban tổ chức.','success');
       } else if(response.editable){
         const r=response.registration;setRole(r.role);setSize(r.size);
         $('jerseyNumber').value=r.number;$('printName').value=r.printName;
+        $('paymentHelp').textContent=r.paid?'Đã được ban tổ chức xác nhận thu tiền.':(r.paymentReported?'Đã báo chuyển khoản, đang chờ đối soát.':'Báo đã chuyển khoản; ban tổ chức sẽ đối soát.');
         $('submissionHelp').textContent='Có thể cập nhật đăng ký đã lưu trên thiết bị này.';
       }
     });
@@ -597,9 +627,9 @@
     const printName=$('printName').value.trim();
     if(printName && printName.length<2)return message('Nếu nhập tên in áo, vui lòng dùng từ 2 ký tự trở lên.','error');
     const submittedStudent=selected;
-    busy=true;$('submitBtn').disabled=true;
+    busy=true;$('submitBtn').disabled=true;$('paymentBtn').disabled=true;
     server('submitRegistration',[{studentId:submittedStudent.id,role,size,number,printName,editToken}],response=>{
-      busy=false;$('submitBtn').disabled=false;
+      busy=false;$('submitBtn').disabled=false;$('paymentBtn').disabled=false;
       // Giữ mã sửa đúng với học sinh vừa lưu nếu phụ huynh đổi ô tìm kiếm trong lúc gửi.
       const tokenSaved=saveToken(submittedStudent.id,response.editToken);
       listRevision++;
@@ -610,6 +640,25 @@
       }
       renderLists(response.lists);
       message('Đăng ký thành công cho '+response.studentName+'! Hai danh sách đã được cập nhật.'+(tokenSaved?'':' Lưu ý: trình duyệt không cho lưu mã sửa; cần liên hệ ban tổ chức nếu muốn cập nhật sau này.'),'success');
+    });
+  });
+  $('paymentBtn').addEventListener('click',()=>{
+    if(busy)return;
+    if(!selected)return message('Vui lòng chọn tên bé đã đăng ký trước khi thông báo chuyển khoản.','error');
+    const currentStudent=selected;
+    const jerseyNumber=$('jerseyNumber').value.trim();
+    if(!/^(?:[0-9]|[1-9][0-9])$/.test(jerseyNumber)) {
+      return message('Vui lòng nhập đúng số áo đã đăng ký để xác nhận chuyển khoản.','error');
+    }
+    busy=true;$('paymentBtn').disabled=true;$('submitBtn').disabled=true;
+    server('submitPaymentReport',[{studentId:currentStudent.id,number:jerseyNumber}],res=>{
+      busy=false;$('submitBtn').disabled=false;$('paymentBtn').disabled=false;
+      if(selected && selected.id===currentStudent.id){
+        $('paymentHelp').textContent=res.verified?
+          'Ban tổ chức đã xác nhận thu tiền.':
+          'Đã báo chuyển khoản · Chờ ban tổ chức đối soát.';
+      }
+      message(res.message,'success');
     });
   });
   // Tự cập nhật cho nhiều phụ huynh cùng mở trang, không gây gián đoạn form.
