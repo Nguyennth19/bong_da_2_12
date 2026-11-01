@@ -171,6 +171,8 @@
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const lastTwo=s=>String(s||'').trim().split(/\s+/).slice(1).join(' ')||String(s||'').trim();
   const tokenKey=id=>'bongda-2-12:'+id;
+  const readToken=id=>{try{return localStorage.getItem(tokenKey(id))||'';}catch(e){return '';}};
+  const saveToken=(id,token)=>{try{localStorage.setItem(tokenKey(id),token);return true;}catch(e){return false;}};
   function message(text,type){
     const el=$('message');el.textContent=text;el.className='notice '+(type||'');el.scrollIntoView({behavior:'smooth',block:'nearest'});
   }
@@ -216,10 +218,10 @@
     $('submitBtn').disabled=false;$('submissionHelp').textContent='Vui lòng chọn học sinh, vai trò, size và số áo.';
   }
   function chooseStudent(s){
-    selected=s;results=[];$('suggestions').innerHTML='';$('studentSearch').value=s.name;
+    selected=s;results=[];searchSequence++;clearTimeout(searchTimer);$('suggestions').innerHTML='';$('studentSearch').value=s.name;
     $('selectedName').textContent='✓ Đã chọn: '+s.name;
     $('printName').value=lastTwo(s.name);
-    editToken=localStorage.getItem(tokenKey(s.id))||'';
+    editToken=readToken(s.id);
     server('getMyRegistration',[s.id,editToken],response=>{
       if(!selected||selected.id!==s.id) return;
       if(response.exists&&!response.editable){
@@ -248,7 +250,14 @@
     }),250);
   });
   $('studentSearch').addEventListener('keydown',e=>{
-    if(e.key==='Enter'){e.preventDefault();if(results.length===1)chooseStudent(results[0]);else if(results.length>1)message('Có nhiều tên phù hợp. Vui lòng chọn đúng bé trong gợi ý.','error');}
+    if(e.key==='Enter'){
+      e.preventDefault();clearTimeout(searchTimer);
+      if(results.length===1)return chooseStudent(results[0]);
+      if(results.length>1)return message('Có nhiều tên phù hợp. Vui lòng chọn đúng bé trong gợi ý.','error');
+      const q=$('studentSearch').value.trim();if(q.length<2)return;
+      const seq=++searchSequence;
+      server('searchStudents',[q],arr=>{if(seq!==searchSequence)return;if(arr.length===1)chooseStudent(arr[0]);else{showSuggestions(arr);message(arr.length?'Có nhiều tên phù hợp. Vui lòng chọn đúng bé trong gợi ý.':'Không tìm thấy tên bé.','error');}});
+    }
   });
   document.querySelectorAll('.role').forEach(b=>b.addEventListener('click',()=>setRole(b.dataset.role)));
   $('submitBtn').addEventListener('click',()=>{
@@ -263,10 +272,10 @@
     busy=true;$('submitBtn').disabled=true;
     server('submitRegistration',[{studentId:selected.id,role,size,number,printName,editToken}],response=>{
       busy=false;$('submitBtn').disabled=false;editToken=response.editToken;
-      localStorage.setItem(tokenKey(selected.id),editToken);
+      const tokenSaved=saveToken(selected.id,editToken);
       renderLists(response.lists);
       $('submissionHelp').textContent='Đã lưu. Có thể sửa từ thiết bị này.';
-      message('Đăng ký thành công cho '+response.studentName+'! Hai danh sách đã được cập nhật.','success');
+      message('Đăng ký thành công cho '+response.studentName+'! Hai danh sách đã được cập nhật.'+(tokenSaved?'':' Lưu ý: trình duyệt không cho lưu mã sửa; cần liên hệ ban tổ chức nếu muốn cập nhật sau này.'),'success');
     });
   });
   $('refreshBtn').addEventListener('click',()=>server('getPublicLists',[],renderLists));
