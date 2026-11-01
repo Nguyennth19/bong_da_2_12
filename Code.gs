@@ -16,7 +16,7 @@ const CFG = Object.freeze({
   sizeImageId: '19FmCI4RBG1WGtMCtg-ZmfUs1Ae8EH_6N',
   paymentQrImageId: '1qHIar0aRKqAmg9v4OllzPYeWQ-n9jguz',
   shirtPrice: 150000,
-  athleteFee: 500000,
+  athleteFee: 1000000,
   supporterFee: 150000,
   availableSizes: ['5','7','9','11','13'],
   allowedRoles: ['Thi đấu','Cổ vũ']
