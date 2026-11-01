@@ -322,6 +322,24 @@
       .confirm-action .submit-help{font-size:11px}
       .payment-fee{align-items:flex-start}
     }
+
+    /* V7: Thi đấu compact / đặt áo rộng, cột trạng thái đã đóng tiền. */
+    .tables{grid-template-columns:minmax(0,0.77fr) minmax(0,1.55fr);gap:16px;align-items:stretch}
+    .tables .table-card{min-width:0}
+    .tables .table-card:first-child{padding:18px}
+    .tables .order-card{padding:clamp(17px,2vw,24px)}
+    .tables .order-card .table-wrap{overflow-x:auto}
+    .tables .order-card table{font-size:clamp(11px,1vw,13px);table-layout:auto}
+    .tables .order-card th,.tables .order-card td{padding:10px 6px}
+    .tables .order-card th:last-child,.tables .order-card td:last-child{text-align:center}
+    .order-note{display:block;font-size:10px;color:#7b6c86;margin-top:4px;max-width:200px;line-height:1.4}
+    .paid-cell{white-space:nowrap;text-align:center}
+    .paid-check{display:inline-flex;width:23px;height:23px;border:1.8px solid #bac8d3;
+      border-radius:6px;align-items:center;justify-content:center;background:#fff;
+      color:transparent;font-size:17px;font-weight:900}
+    .paid-check.is-paid{background:#e2f6e9;border-color:#0a9f50;color:#058a41}
+    @media(max-width:900px){.tables{grid-template-columns:1fr;gap:17px}}
+    @media(max-width:430px){.tables .order-card table{font-size:11px}.tables .order-card{padding:13px}}
 </style>
 </head>
 <body>
@@ -338,7 +356,7 @@
 
     <section class="stats" aria-label="Thống kê">
       <div class="stat"><b id="countAthletes">0</b><span>Bé tham gia thi đấu</span></div>
-      <div class="stat"><b id="countSupporters">0</b><span>Bé cổ vũ và đặt áo</span></div>
+      <div class="stat"><b id="countSupporters">0</b><span>Bộ áo cổ vũ</span></div>
       <div class="stat"><b id="countOrders">0</b><span>Bộ áo đã đăng ký</span></div>
     </section>
 
@@ -468,7 +486,7 @@
       <div class="card table-card order-card">
         <div class="table-header"><div><h2>Danh sách đặt áo</h2><div class="sub">Bao gồm bé thi đấu và bé cổ vũ</div></div>
           <button type="button" class="muted-btn" id="printOrders">🖨 In đơn áo</button></div>
-        <div class="table-wrap"><table><thead><tr><th>STT</th><th>Họ tên</th><th>Tên in áo</th><th>Size</th><th>Số áo</th><th>Vai trò</th></tr></thead><tbody id="ordersBody"><tr><td colspan="6" class="empty">Đang tải...</td></tr></tbody></table></div>
+        <div class="table-wrap"><table><thead><tr><th>STT</th><th>Họ tên</th><th>Tên in áo</th><th>Size</th><th>Số áo</th><th>Vai trò</th><th>Đã đóng</th></tr></thead><tbody id="ordersBody"><tr><td colspan="7" class="empty">Đang tải...</td></tr></tbody></table></div>
       </div>
     </section>
     <footer class="footer">Thông tin đăng ký dành cho phụ huynh lớp 2/12. Không chia sẻ đường link ra ngoài nhóm lớp.</footer>
@@ -542,8 +560,11 @@
       '<tr><td>'+r.stt+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.number)+'</td></tr>').join(''):
       '<tr><td colspan="3" class="empty">Chưa có bé đăng ký thi đấu</td></tr>';
     $('ordersBody').innerHTML=lists.orders.length?lists.orders.map(r=>
-      '<tr><td>'+r.stt+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.printName)+'</td><td>'+esc(r.size)+'</td><td>'+esc(r.number)+'</td><td>'+esc(r.role)+'</td></tr>').join(''):
-      '<tr><td colspan="6" class="empty">Chưa có đơn đặt áo</td></tr>';
+      '<tr><td>'+r.stt+'</td><td>'+esc(r.name)+(r.notes?'<small class="order-note">'+esc(r.notes)+'</small>':'')+'</td>'+
+      '<td>'+esc(r.printName)+'</td><td>'+esc(r.size)+'</td><td>'+esc(r.number)+'</td>'+
+      '<td>'+esc(r.role)+'</td><td class="paid-cell"><span class="paid-check '+(r.paid?'is-paid':'')+'" '+
+      'aria-label="'+(r.paid?'Đã thu tiền':'Chưa xác nhận thu tiền')+'">'+(r.paid?'✓':'')+'</span></td></tr>').join(''):
+      '<tr><td colspan="7" class="empty">Chưa có đơn đặt áo</td></tr>';
   }
   function renderChart(chart){
     $('sizeButtons').innerHTML=chart.filter(x=>x.available).map(x=>
@@ -679,15 +700,15 @@
   });
   function printTable(type){
     const athlete=type==='athletes';
-    const headers=athlete?['STT','Họ và tên','Số áo']:['STT','Họ và tên','Tên in áo','Size','Số áo','Hình thức'];
-    const keys=athlete?['stt','name','number']:['stt','name','printName','size','number','role'];
+    const headers=athlete?['STT','Họ và tên','Số áo']:['STT','Họ và tên','Tên in áo','Size','Số áo','Hình thức','Đã đóng'];
+    const keys=athlete?['stt','name','number']:['stt','name','printName','size','number','role','paid'];
     const records=lists[type];const title=athlete?'DANH SÁCH THAM GIA THI ĐẤU':'DANH SÁCH ĐẶT ÁO ĐẤU';
     const w=window.open('','_blank');if(!w)return message('Trình duyệt đang chặn cửa sổ in. Hãy cho phép pop-up rồi thử lại.','error');
     w.document.open();
     w.document.write('<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>'+esc(title)+'</title>'+
       '<style>@page{size:A4;margin:16mm}body{font-family:Arial,sans-serif;color:#111}h1{font-size:18px;text-align:center}p{text-align:center;font-size:13px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border:1px solid #222;padding:8px;text-align:left}th{background:#eee}td:first-child{text-align:center;width:35px}.footer{margin-top:25px;text-align:right}</style></head><body>'+
       '<h1>'+esc(title)+'</h1><p>Lớp 2/12 · Số lượng: '+records.length+'</p><table><thead><tr>'+headers.map(x=>'<th>'+esc(x)+'</th>').join('')+'</tr></thead><tbody>'+
-      records.map(r=>'<tr>'+keys.map(k=>'<td>'+esc(r[k])+'</td>').join('')+'</tr>').join('')+
+      records.map(r=>'<tr>'+keys.map(k=>'<td>'+esc(k==='paid'?(r.paid?'✓':''):r[k])+'</td>').join('')+'</tr>').join('')+
       '</tbody></table><div class="footer">Ngày in: '+new Date().toLocaleDateString('vi-VN')+'</div></body></html>');
     w.document.close();w.focus();setTimeout(()=>w.print(),400);
   }
