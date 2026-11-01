@@ -22,6 +22,20 @@
 - [ ] Không còn nút “Cập nhật hai danh sách”; sau khi lưu, danh sách và thống kê cập nhật ngay.
 - [ ] Bảng thi đấu và bảng đặt áo vẫn xếp theo tên gọi A–Z và đánh lại STT.
 
+## V8 — nghiệm thu đội tuyển thủ công, size theo kg và auto fill
+- [ ] `DANH SACH HOC SINH` vẫn có đúng 43 bé và STUDENT_ID gốc.
+- [ ] `DOI_THI_DAU` có 13 tên từ giấy, không có tên trùng, mỗi bé dùng STUDENT_ID chính xác.
+- [ ] `DS_THI_DAU` có 14 bé (13 từ giấy + Lịch Khê), xếp theo tên gọi A-Z; các bé chưa mua áo có số áo trống.
+- [ ] Đăng ký áo cho bé đã có trong `DOI_THI_DAU` nhưng chưa có `DANG_KY`, rồi kiểm tra số áo tự cập nhật trong `DS_THI_DAU` mà không tạo cầu thủ trùng.
+- [ ] `Nguyễn Đức Phú` có đơn số 17, size 5 vì cân nặng 20kg; xuất hiện trong cả danh sách cầu thủ và bảng áo.
+- [ ] `Lâm Gia Minh` có số 21 trong danh sách cầu thủ và một áo em bé số trống trong đơn áo; vai trò đơn áo Cổ vũ vẫn giữ theo dữ liệu trước đó.
+- [ ] `Cô Ngọc` size S số 12 vẫn chỉ là đơn áo, không có trong đội tuyển hoặc 43 học sinh gốc.
+- [ ] Không hiển thị ghi chú ngoại lệ và ghi chú nội bộ bên cạnh tên Cô Ngọc trong Web App.
+- [ ] `Lịch Khê` giữ size 7 số 19 từ lần cập nhật trước.
+- [ ] `sizeFromWeight_('20kg')` trả '5'; các giá trị không nằm mốc nhà cung cấp trả rỗng.
+- [ ] DS_DAT_AO có 12 đơn, các checkbox đã đóng tiền không bị đổi; mobile vẫn hiển thị đủ cột.
+- [ ] `clasp push` / `/dev` / `/exec`: kiểm tra dữ liệu tự cập nhật, số cầu thủ mới và không hiển thị ghi chú admin.
+
 ## V7 — nghiệm thu đơn áo thêm và thanh toán
 - [ ] `DANH SACH HOC SINH` giữ nguyên 43 học sinh; không bổ sung người lớn vào roster.
 - [ ] `DANG_KY`: hồ sơ chính Gia Minh = Cổ vũ, size 7, số 21; Lịch Khê size 7, số 19.
