@@ -86,8 +86,8 @@ function submitRegistration(input) {
     if(!/^(?:[0-9]|[1-9][0-9])$/.test(rawNumber)) throw new Error('Số áo cần là số từ 0 đến 99.');
     const number=String(Number(rawNumber));
     const printName=String(input.printName||'').replace(/\s+/g,' ').trim();
-    if(printName.length<2 || printName.length>40 || /[<>\r\n]/.test(printName)) {
-      throw new Error('Tên in áo cần từ 2–40 ký tự và không chứa ký tự đặc biệt < >.');
+    if(printName.length<2 || printName.length>40 || /[<>\r\n]/.test(printName) || /^[=+@-]/.test(printName)) {
+      throw new Error('Tên in áo cần 2–40 ký tự và không được bắt đầu bằng ký tự công thức.');
     }
     const ss=SpreadsheetApp.openById(CFG.spreadsheetId);
     const sh=ss.getSheetByName(CFG.registrationSheet);
