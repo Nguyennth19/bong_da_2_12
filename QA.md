@@ -22,6 +22,20 @@
 - [ ] Không còn nút “Cập nhật hai danh sách”; sau khi lưu, danh sách và thống kê cập nhật ngay.
 - [ ] Bảng thi đấu và bảng đặt áo vẫn xếp theo tên gọi A–Z và đánh lại STT.
 
+## V7 — nghiệm thu đơn áo thêm và thanh toán
+- [ ] `DANH SACH HOC SINH` giữ nguyên 43 học sinh; không bổ sung người lớn vào roster.
+- [ ] `DANG_KY`: hồ sơ chính Gia Minh = Cổ vũ, size 7, số 21; Lịch Khê size 7, số 19.
+- [ ] `AO_BO_SUNG`: 2 đơn độc lập gồm 1 áo em bé size 7 chưa có số và 1 áo người lớn ngoại lệ size S số 12; H có checkbox PAID = FALSE.
+- [ ] `DS_THI_DAU`: 7 học sinh, không có người chỉ cổ vũ.
+- [ ] `DS_DAT_AO`: 11 dòng áo + header, gồm 2 áo Gia Minh và 1 áo ngoại lệ Cô Ngọc, số áo em bé để trống.
+- [ ] Cột G DS_DAT_AO là ĐÃ ĐÓNG TIỀN, đang trống vì chưa xác nhận tiền; web app ô trống khi PAID false, dấu ✓ xanh khi true.
+- [ ] Sau khi BQT tick DANG_KY!M hoặc AO_BO_SUNG!H, Web App tự hiển thị trạng thái sau đồng bộ (≤30s); với trigger đã cài, DS_DAT_AO cập nhật ngay.
+- [ ] Thử in đơn áo: khổ A4 có cột đã đóng; dòng em bé số áo để trống để viết bổ sung.
+- [ ] Size 8 không còn trong các nút; size 9 có đủ số đo gốc; size S chỉ là đơn ngoại lệ.
+- [ ] Desktop: bảng thi đấu nhỏ hơn bảng áo; trên mobile hai bảng xếp dọc, có thể cuộn bảng áo ngang để không bị cắt chữ.
+- [ ] Không có số liệu thanh toán nào được tự suy từ checkbox màu xanh trong ảnh nhóm.
+- [ ] Cần kiểm thử trên link /dev sau clasp push, sau đó New version cập nhật /exec.
+
 ## V6 — nguồn ảnh, checkbox và hai nút
 - [ ] `DANG_KY!A2:S10` có đúng 9 bản ghi; mỗi hàng khớp đúng một STUDENT_ID gốc.
 - [ ] `DS_THI_DAU` có 7 bé; `DS_DAT_AO` có 8 đơn; không có Gia Minh chưa rõ số áo trong hai danh sách in.
