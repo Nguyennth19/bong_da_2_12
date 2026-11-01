@@ -57,6 +57,8 @@ Danh sách in **xếp theo tên gọi cuối A–Z** (quy ước xếp tên ph�
 - Ảnh lấy từ Drive bằng quyền của tài khoản triển khai và được nhúng vào trang, không cần mở công khai quyền truy cập ảnh.
 
 ## Quyền riêng tư
+Nếu ban tổ chức chỉnh sửa thủ công DANG_KY, chạy hàm `refreshSummaries()` trong Apps Script để làm mới hai tab báo cáo. Khi sắp xếp danh sách học sinh, luôn sắp **cả cột A:C** để STUDENT_ID đi cùng đúng bé.
+
 Tên học sinh đã đăng ký xuất hiện trong hai danh sách trên trang. Chỉ gửi link cho người được phép xem thông tin của nhóm lớp. Không cấp quyền Editor của Sheet cho toàn bộ phụ huynh; không đẩy danh sách học sinh và đơn áo lên GitHub.
 
 Xem [QA.md](QA.md) trước khi sử dụng chính thức.
