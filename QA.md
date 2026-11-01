@@ -22,6 +22,20 @@
 - [ ] Không còn nút “Cập nhật hai danh sách”; sau khi lưu, danh sách và thống kê cập nhật ngay.
 - [ ] Bảng thi đấu và bảng đặt áo vẫn xếp theo tên gọi A–Z và đánh lại STT.
 
+## V5 — acceptance test quỹ và ảnh mới
+- [ ] Module thu quỹ nằm **sau hero** và **trước ba ô thống kê**, layout hai cột desktop, một cột mobile.
+- [ ] Phí thi đấu dự kiến **400.000đ/bé**, áo **150.000đ/bộ**, sân/ăn/uống **100.000đ/buổi**, ghi chú hoàn dư/quà rõ ràng.
+- [ ] Người chỉ cổ vũ/mua áo được thông báo **150.000đ/bộ**.
+- [ ] Đúng ngân hàng VPBank, tên tài khoản NGUYEN TRAN HOANG NGUYEN, số tài khoản 105310811.
+- [ ] QR cắt chỉ còn phần mã, không có phần thông tin tài khoản/quảng cáo của ảnh gốc; mã quét thành công trên ứng dụng ngân hàng.
+- [ ] Khi chọn bé, cú pháp chuyển khoản tự đổi thành `[Họ tên bé] - Lớp 2/12 - Đóng quỹ bóng đá`.
+- [ ] Không chọn bé thì hiển thị gợi ý `[Tên bé] - Lớp 2/12 - Đóng quỹ bóng đá`.
+- [ ] Header lấy ảnh `boy-chibi.png` phiên bản ~132KB với ID Drive mới.
+- [ ] Giá hiển thị trong khung áo và giá ghi vào đơn mới đều là 150.000đ; đơn đã có trước đó không bị migrate.
+- [ ] Trên trình duyệt chính thức /dev và /exec, kiểm tra mã QR không bị ẩn và được giải mã đúng.
+- [ ] Ảnh QR/crest không yêu cầu cấp quyền Drive cho phụ huynh (base64 được nhúng lúc chạy doGet).
+- [ ] Cập nhật code không chỉnh sửa bất kỳ ô học sinh hoặc hàng đăng ký nào trên Sheets.
+
 ## V4 — checklist chibi và cân đối khung
 - [ ] Header có hình `boy-chibi.png` thực tế, không còn quả bóng mặc định nếu ảnh tải được.
 - [ ] Với file chibi gốc 3,57 MB, hàm `imageDataUri_` trả về PNG base64 thay vì từ chối vì giới hạn 2 MB.
