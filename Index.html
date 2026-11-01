@@ -314,7 +314,7 @@
   }
   function renderChart(chart){
     $('sizeButtons').innerHTML=chart.filter(x=>x.available).map(x=>
-      '<button type="button" class="size-btn" data-size="'+esc(x.size)+'">'+esc(x.size)+'</button>').join('');
+      '<button type="button" class="size-btn" aria-pressed="false" data-size="'+esc(x.size)+'">'+esc(x.size)+'</button>').join('');
     $('sizeRows').innerHTML=chart.map(x=>
       '<tr class="'+(x.available?'':'unavailable')+'"><td>'+esc(x.size)+(x.available?'':' *')+'</td><td>'+esc(x.weight)+'</td><td>'+esc(x.length)+'</td><td>'+esc(x.chest)+'</td></tr>').join('');
     $('sizeButtons').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>setSize(b.dataset.size)));
@@ -325,7 +325,7 @@
   }
   function setSize(value){
     size=value;
-    document.querySelectorAll('.size-btn').forEach(b=>b.classList.toggle('active',b.dataset.size===value));
+    document.querySelectorAll('.size-btn').forEach(b=>{const active=b.dataset.size===value;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
     const row=[...$('sizeRows').querySelectorAll('tr')].find(x=>x.firstElementChild.textContent.trim()===value);
     $('sizeSelected').textContent=value?'Đã chọn size '+value+(row?' · '+row.children[1].textContent+' · dài '+row.children[2].textContent:''):'';
   }
@@ -386,14 +386,19 @@
     if(!/^(?:[0-9]|[1-9][0-9])$/.test(number))return message('Nhập số áo từ 0 đến 99.','error');
     const printName=$('printName').value.trim();
     if(printName && printName.length<2)return message('Nếu nhập tên in áo, vui lòng dùng từ 2 ký tự trở lên.','error');
+    const submittedStudent=selected;
     busy=true;$('submitBtn').disabled=true;
-    server('submitRegistration',[{studentId:selected.id,role,size,number,printName,editToken}],response=>{
-      busy=false;$('submitBtn').disabled=false;editToken=response.editToken;
-      const tokenSaved=saveToken(selected.id,editToken);
+    server('submitRegistration',[{studentId:submittedStudent.id,role,size,number,printName,editToken}],response=>{
+      busy=false;$('submitBtn').disabled=false;
+      // Giữ mã sửa đúng với học sinh vừa lưu nếu phụ huynh đổi ô tìm kiếm trong lúc gửi.
+      const tokenSaved=saveToken(submittedStudent.id,response.editToken);
       listRevision++;
-      if(!printName)$('printName').value=response.printName || lastTwo(selected.name);
+      if(selected && selected.id===submittedStudent.id){
+        editToken=response.editToken;
+        if(!printName)$('printName').value=response.printName || lastTwo(submittedStudent.name);
+        $('submissionHelp').textContent='Đã lưu. Có thể sửa từ thiết bị này.';
+      }
       renderLists(response.lists);
-      $('submissionHelp').textContent='Đã lưu. Có thể sửa từ thiết bị này.';
       message('Đăng ký thành công cho '+response.studentName+'! Hai danh sách đã được cập nhật.'+(tokenSaved?'':' Lưu ý: trình duyệt không cho lưu mã sửa; cần liên hệ ban tổ chức nếu muốn cập nhật sau này.'),'success');
     });
   });
