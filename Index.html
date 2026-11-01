@@ -481,7 +481,7 @@
         const sx=img.naturalWidth/1254,sy=img.naturalHeight/2560;
         ctx.clearRect(0,0,canvas.width,canvas.height);
         ctx.drawImage(img,166*sx,492*sy,924*sx,1012*sy,0,0,924,1012);
-        msg.hidden=true;
+        canvas.hidden=false;msg.hidden=true;
       }catch(e){
         console.warn('QR render error',e);
         canvas.hidden=true;msg.hidden=false;
