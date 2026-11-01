@@ -10,9 +10,10 @@ const CFG = Object.freeze({
   athleteSheet: 'DS_THI_DAU',
   jerseySheet: 'DS_DAT_AO',
   jerseyImageId: '1ZRsAJOUB4ASQ6DFMd-pW0lNhWVC5UD93',
-  crestImageId: '1fwefzqlmTwvp3Rc5R7CGX-9IUZCfWTbA',
+  crestImageId: '1hK0oAl1M_yHtrUjsUGHVJSY9UQ7kWqQz',
   sizeImageId: '19FmCI4RBG1WGtMCtg-ZmfUs1Ae8EH_6N',
-  shirtPrice: 147000,
+  paymentQrImageId: '1qHIar0aRKqAmg9v4OllzPYeWQ-n9jguz',
+  shirtPrice: 150000,
   availableSizes: ['5','7','8','11','13'],
   allowedRoles: ['Thi đấu','Cổ vũ']
 });
@@ -32,8 +33,13 @@ const SIZE_CHART = [
 function doGet() {
   const tpl=HtmlService.createTemplateFromFile('Index');
   tpl.jerseyImage = imageDataUri_(CFG.jerseyImageId);
-  tpl.crestImage = imageDataUri_(CFG.crestImageId, 5 * 1024 * 1024);
+  tpl.crestImage = imageDataUri_(CFG.crestImageId);
   tpl.sizeImage = imageDataUri_(CFG.sizeImageId);
+  // Full source QR remains in Drive; client crops QR-only bounds without regenerating QR bits.
+  tpl.paymentQrImage = imageDataUri_(CFG.paymentQrImageId);
+  tpl.bankAccountName = 'NGUYEN TRAN HOANG NGUYEN';
+  tpl.bankAccountNumber = '105310811';
+  tpl.bankName = 'VPBank';
   return tpl.evaluate()
     .setTitle('Đăng ký bóng đá 2/12')
     .addMetaTag('viewport','width=device-width, initial-scale=1');

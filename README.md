@@ -31,12 +31,25 @@ Giao diện dùng **Be Vietnam Pro** qua Google Fonts (fallback Arial khi offlin
 - Ở màn hình lớn, hai khung ảnh áo và thông số được kéo giãn theo cùng một chiều cao; khung bên phải hẹp hơn một chút và giảm khoảng trống. Ở màn hình nhỏ, hai khung xếp dọc.
 - `/exec` cần deploy phiên bản mới sau `clasp push`. Không có thay đổi cấu trúc dữ liệu Sheets.
 
+## V5 — module thu quỹ & QR chuyển khoản
+- Chèn **module mới giữa header và ba ô thống kê**, hai cột tự co giãn: bên trái thông báo quỹ, bên phải thông tin VPBank và mã QR.
+- Mức dự định thu cho **bé thi đấu: 400.000đ/bé**. Chi phí tham khảo: **áo 150.000đ/bộ**, **thuê sân/ăn nhẹ/nước uống 100.000đ/buổi**. Quỹ sẽ quyết toán, khoản dư hoàn trả hoặc mua quà kỷ niệm.
+- Bé **cổ vũ chỉ mua áo: 150.000đ/bộ**.
+- Thông tin được trích từ ảnh `Ma_QR.jpg` trong Drive: **VPBank / NGUYEN TRAN HOANG NGUYEN / 105310811**. Chuỗi chuyển khoản tự điền tên bé từ ô tìm kiếm.
+- **Chỉ hiển thị vùng QR**, không hiển thị lại họ tên, số tài khoản, quảng cáo app bên trong ảnh. Canvas cắt ảnh nguồn 1254×2560 tại vùng (166,492) kích thước 924×1012 và không vẽ lại QR, đã thử giải mã thành công.
+- **Ảnh chibi đã thay** sang file mới `1hK0oAl1M_yHtrUjsUGHVJSY9UQ7kWqQz` (~132 KB); không còn dùng bản lớn trước đó.
+- Giá áo dùng để lưu vào đơn **đổi từ 147.000đ lên 150.000đ** để thống nhất thông báo thu quỹ. **Bản ghi đã lưu trước đó không tự đổi đơn giá**.
+- Giữ nguyên source học sinh, các tab trong Sheets và quyền dữ liệu. Không chạy lại `setupProject()` khi chỉ cập nhật GitHub.
+- Khi thay file ảnh Drive bằng **file ID mới**, cần cập nhật `CFG.crestImageId` hoặc `CFG.paymentQrImageId` trong `Code.gs`. Nếu thay nội dung ngay trên cùng ID thì không cần sửa ID.
+
 ## Nguồn dữ liệu
 - [Google Sheet DA_BONG_2_12](https://docs.google.com/spreadsheets/d/1hZc7Xvpy2jfBRZZF0o07msk6zc6TgZBst4PDrC4fdtk/edit), tab `DANH SACH HOC SINH` có 43 em vào thời điểm khảo sát.
 - [Ảnh áo đấu](https://drive.google.com/file/d/1ZRsAJOUB4ASQ6DFMd-pW0lNhWVC5UD93/view)
+- [Ảnh chibi bản nhẹ](https://drive.google.com/file/d/1hK0oAl1M_yHtrUjsUGHVJSY9UQ7kWqQz/view)
+- [Ảnh QR gốc](https://drive.google.com/file/d/1qHIar0aRKqAmg9v4OllzPYeWQ-n9jguz/view)
 - [Bảng size ảnh gốc](https://drive.google.com/file/d/19FmCI4RBG1WGtMCtg-ZmfUs1Ae8EH_6N/view)
 
-Giá mẫu áo **147.000đ/bộ**; ảnh nhà cung cấp ghi size 5, 7, 9, 11, 13. Giao diện hiện triển khai theo lựa chọn mới 5, 7, 8, 11, 13; thông số size 8 còn chờ xác nhận từ nhà cung cấp, không suy đoán.
+Giá quảng cáo gốc của nhà cung cấp **147.000đ/bộ**, nhưng phí thu theo chương trình đã chốt là **150.000đ/bộ**; ảnh nhà cung cấp ghi size 5, 7, 9, 11, 13. Giao diện hiện triển khai theo lựa chọn mới 5, 7, 8, 11, 13; thông số size 8 còn chờ xác nhận từ nhà cung cấp, không suy đoán.
 
 ## Cấu trúc mã nguồn
 - `Code.gs`: kiểm tra dữ liệu, tìm tên không dấu, lưu một bản ghi / học sinh, kiểm soát số áo trùng ở nhóm Thi đấu, tạo bảng in.
