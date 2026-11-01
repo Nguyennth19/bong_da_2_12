@@ -55,6 +55,17 @@ Giao diện dùng **Be Vietnam Pro** qua Google Fonts (fallback Arial khi offlin
 - Các hồ sơ nhập ảnh được khóa cập nhật qua Web App nếu không có mã sửa trên trình duyệt; BQT điều chỉnh ở tab `DANG_KY` rồi chạy `refreshSummaries()`. Các nút thông báo chuyển khoản chỉ thay đổi `PAYMENT_REPORTED`, không thay đổi `PAID`.
 - Không chạy lại `setupProject()` chỉ để đồng bộ giao diện. Không cần nhập lại 9 hồ sơ; tránh nhân bản.
 
+## V7 — Đơn áo bổ sung, ngoại lệ và dấu đã đóng
+- **Danh mục size chính thức:** 5, 7, 9, 11, 13. Size 8 trước đây là nhầm lẫn; đã loại khỏi lựa chọn Web App. Size `S` chỉ dành cho **đơn ngoại lệ áo người lớn** trong `AO_BO_SUNG`, không hiện trong form áo học sinh.
+- `DANG_KY`: lưu **một hồ sơ chính / học sinh**; người mua nhiều bộ vẫn giữ mã STUDENT_ID duy nhất. Hồ sơ Gia Minh được cập nhật `Cổ vũ`, size 7, số áo lớn 21 và ghi chú đặt 2 bộ; số tiền đặt áo dự kiến tổng 300.000đ. Hồ sơ Lịch Khê hiện đã là size 7, số áo 19, không sửa lại.
+- Thêm tab `AO_BO_SUNG` chứa áo thêm riêng từng đơn: một bộ em bé size 7 **để trống số áo** (để điền sau khi in); một bộ áo ngoại lệ `Cô Ngọc`, size `S`, số 12, vai trò `Cổ vũ`, không đưa vào `DANH SACH HOC SINH`.
+- `AO_BO_SUNG` có cột `PAID` (H) là **checkbox của ban tổ chức**; mỗi bộ là một dòng, `SO_LUONG` = 1. Không chèn thêm người ngoài vào danh sách học sinh gốc.
+- Bảng `DS_DAT_AO` mới có **7 cột**, cột cuối `ĐÃ ĐÓNG TIỀN` chứa dấu ✓ màu xanh lá chỉ khi được xác nhận. Web App hiển thị một **ô vuông trống** nếu chưa thu, **dấu ✓ xanh** khi đã thu. Cả hai đều chỉ là trạng thái *đọc*, không được tự đánh dấu qua web công khai.
+- Web App kết hợp các đơn chính và `AO_BO_SUNG`; hiện có **11 bộ áo** theo các dữ liệu đang lưu, **7 học sinh thi đấu**. Các khoản thanh toán không được đánh dấu chỉ dựa vào screenshot chọn hàng trong ứng dụng khác.
+- Giao diện desktop ưu tiên **thu hẹp bảng thi đấu** và **mở rộng bảng đặt áo** theo tỷ lệ gần 1:2; mobile vẫn hiển thị hai bảng xếp dọc. Nút in đơn áo có thêm cột đã đóng.
+- Để tab báo cáo trên Sheets tự cập nhật sau khi tick `PAID` ở tab `DANG_KY` hoặc `AO_BO_SUNG`, hãy chạy một lần `installPaymentEditTrigger()` trong Apps Script, cấp quyền khi được yêu cầu. Nếu chưa cài trigger, có thể chạy thủ công `refreshSummaries()`; Web App vẫn tự đọc tình trạng thu mới khi đồng bộ.
+- Sau khi đồng bộ, **không chạy lại lệnh nhập dữ liệu**: dữ liệu đã ghi trực tiếp vào Google Sheets. Chỉ `clasp push` và deploy phiên bản Web App mới.
+
 ## Nguồn dữ liệu
 - [Google Sheet DA_BONG_2_12](https://docs.google.com/spreadsheets/d/1hZc7Xvpy2jfBRZZF0o07msk6zc6TgZBst4PDrC4fdtk/edit), tab `DANH SACH HOC SINH` có 43 em vào thời điểm khảo sát.
 - [Ảnh áo đấu](https://drive.google.com/file/d/1ZRsAJOUB4ASQ6DFMd-pW0lNhWVC5UD93/view)
