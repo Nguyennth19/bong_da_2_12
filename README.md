@@ -13,12 +13,22 @@ Giữ nguyên hero và 3 ô thống kê. Các module theo thứ tự:
 Giao diện dùng **Be Vietnam Pro** qua Google Fonts (fallback Arial khi offline), màu xanh ngọc / xanh dương / tím / cam hồng, các kích thước responsive theo desktop/tablet/mobile. **Không cần nút Cập nhật**: sau khi đăng ký, dữ liệu cập nhật ngay; khi trang đang mở và còn hiển thị, hệ thống đồng bộ danh sách từ Sheets mỗi **30 giây**, đồng thời làm mới khi trở lại tab. Không cần tải lại trang.
 
 
+## V3 — điều chỉnh theo ảnh nghiệm thu
+- Loại toàn bộ huy hiệu số 1, 2, 3, 4, 5 ở phần tiêu đề module. Module 1 đặt chú thích **phía trên** hai lựa chọn.
+- Module 2 bỏ ghi chú dưới ô tìm học sinh; dùng **ảnh thực tế `ao_dau.jpg`** từ Drive, được server chuyển thành **base64 data URI** và xuất qua `<?!= jerseyImage ?>` để tránh HTML template escape làm mất ảnh.
+- Chỉ hiển thị 5 size **5, 7, 8, 11, 13**. **Lưu ý nguồn:** ảnh bảng size nhà cung cấp ghi **9**, không phải **8**; size **8** chưa có số đo xác thực, vì vậy các ô cân nặng/dài áo/vòng ngực của size 8 hiển thị dấu **—**, không chép nhầm thông số size 9. Không sửa các đơn size 9 đã được lưu từ trước.
+- Tên in áo được phép để trống; backend tự lấy **đúng hai từ cuối**, ví dụ `Nguyễn Đình Lịch Khê` → `Lịch Khê`. Bỏ đoạn giải thích dài dưới form.
+- Module 3: chỉ còn nút Xác nhận full-width và chú thích ở dưới; các bảng 4/5 cùng chiều rộng, kéo giãn cùng chiều cao và vị trí nút in đồng nhất.
+- Ẩn dòng chú thích tự đồng bộ; cơ chế cập nhật tự động mỗi 30 giây vẫn hoạt động.
+- Thêm viền trên có màu cho module 2 và khung xác nhận để đồng bộ hệ màu.
+- Không cần chạy lại `setupProject()` khi chỉ cập nhật Web App từ GitHub.
+
 ## Nguồn dữ liệu
 - [Google Sheet DA_BONG_2_12](https://docs.google.com/spreadsheets/d/1hZc7Xvpy2jfBRZZF0o07msk6zc6TgZBst4PDrC4fdtk/edit), tab `DANH SACH HOC SINH` có 43 em vào thời điểm khảo sát.
 - [Ảnh áo đấu](https://drive.google.com/file/d/1ZRsAJOUB4ASQ6DFMd-pW0lNhWVC5UD93/view)
 - [Bảng size ảnh gốc](https://drive.google.com/file/d/19FmCI4RBG1WGtMCtg-ZmfUs1Ae8EH_6N/view)
 
-Giá mẫu áo **147.000đ/bộ**; các size bán theo ảnh là **5, 7, 9, 11, 13**. Size 1, 3, 15 chỉ để tham khảo. Bảng nhà cung cấp không có cột chiều cao: ứng dụng không tự bịa số đo.
+Giá mẫu áo **147.000đ/bộ**; ảnh nhà cung cấp ghi size 5, 7, 9, 11, 13. Giao diện hiện triển khai theo lựa chọn mới 5, 7, 8, 11, 13; thông số size 8 còn chờ xác nhận từ nhà cung cấp, không suy đoán.
 
 ## Cấu trúc mã nguồn
 - `Code.gs`: kiểm tra dữ liệu, tìm tên không dấu, lưu một bản ghi / học sinh, kiểm soát số áo trùng ở nhóm Thi đấu, tạo bảng in.
@@ -61,7 +71,7 @@ Danh sách in **xếp theo tên gọi cuối A–Z** (quy ước xếp tên ph�
 
 ## Quy tắc V1
 - Không có checkbox mua áo: mỗi lượt đăng ký phải điền đầy đủ thông tin một bộ áo.
-- **Tên in áo không bắt buộc.** Nếu để trống, máy chủ tự lấy **tên lót + tên** (bỏ họ đầu tiên) để ghi vào DS_DAT_AO; nếu phụ huynh nhập, giữ nguyên tên đã nhập.
+- **Tên in áo không bắt buộc.** Nếu để trống, máy chủ tự lấy **đúng hai từ cuối của họ tên** để ghi vào DS_DAT_AO; nếu phụ huynh nhập, giữ nguyên tên đã nhập.
 - Một học sinh chỉ có một bản ghi; đăng ký lại trên **cùng trình duyệt** có mã lưu cục bộ thì cập nhật bản ghi.
 - Thiết bị khác không có mã sửa sẽ không ghi đè dữ liệu đã đăng ký; cần liên hệ ban tổ chức.
 - Số áo 0–99; **không được trùng giữa hai học sinh Thi đấu**.

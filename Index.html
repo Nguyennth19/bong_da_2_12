@@ -172,6 +172,33 @@
     }
     @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
     @media print{body{background:#fff}.hero,.stats,.module,.confirm-card,.tables,.footer{display:none!important}}
+
+    /* V3: đồng nhất khoảng cách, header màu và kích thước module */
+    .module{margin-bottom:20px}
+    .module-header{margin-bottom:16px}
+    .role-note{margin:0 0 16px;padding:12px 14px;font-weight:600}
+    .registration-card{border-top:5px solid #a78ce9}
+    .confirm-card{border-top:5px solid #24c6aa;margin-bottom:20px;padding:18px clamp(18px,2.6vw,28px)}
+    .confirm-card .actions{display:flex;flex-direction:column;align-items:stretch;gap:8px}
+    .confirm-card .primary{display:block;width:100%;min-height:56px;font-size:clamp(15px,1.8vw,18px)}
+    .confirm-card .submit-help{display:block;text-align:center;line-height:1.6}
+    .tables{grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch;gap:20px;margin:0 0 20px}
+    .tables .table-card{display:flex;flex-direction:column;min-height:300px;height:100%}
+    .tables .table-header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;min-height:74px;gap:9px}
+    .tables .table-header>div{min-width:0}
+    .tables .table-header .muted-btn{justify-self:end;white-space:nowrap}
+    .tables .table-header h2{font-size:clamp(17px,1.8vw,21px)}
+    .tables .table-wrap{flex:1;min-height:145px;overflow-x:auto}
+    .image-error{margin:14px;font-size:12px;color:#a33b3b}
+    .jersey-photo img[hidden]{display:none}
+    @media(max-width:700px){
+      .tables{grid-template-columns:1fr;gap:18px}
+      .tables .table-card{min-height:280px}
+    }
+    @media(max-width:430px){
+      .tables .table-header{grid-template-columns:minmax(0,1fr) auto}
+      .tables .table-header .muted-btn{font-size:11px;padding:8px}
+    }
 </style>
 </head>
 <body>
@@ -190,7 +217,8 @@
 
     <!-- Module 1: full-width participation choices -->
     <section class="card module role-card" id="module1" aria-labelledby="roleTitle">
-      <div class="module-header"><span class="step">1</span><h2 id="roleTitle">Hình thức tham gia</h2></div>
+      <div class="module-header"><h2 id="roleTitle">Hình thức tham gia</h2></div>
+      <p class="role-note">💡 Cả hai nhóm đều được đăng ký áo đấu. Chọn một hình thức tham gia để tiếp tục.</p>
       <div class="roles" role="group" aria-label="Hình thức tham gia">
         <button type="button" class="role" data-role="Thi đấu" aria-pressed="false">
           <span class="role-main"><span class="role-icon" aria-hidden="true">⚽</span><span><strong>Tham gia thi đấu</strong><small>Bé có tên trong danh sách thi đấu nộp trường</small></span></span><span class="role-check" aria-hidden="true"></span>
@@ -199,12 +227,11 @@
           <span class="role-main"><span class="role-icon" aria-hidden="true">📣</span><span><strong>Tham gia cổ vũ</strong><small>Bé cổ vũ, không nằm trong danh sách thi đấu</small></span></span><span class="role-check" aria-hidden="true"></span>
         </button>
       </div>
-      <p class="role-note">💡 Cả hai nhóm đều được đăng ký áo đấu. Chọn một hình thức tham gia để tiếp tục.</p>
     </section>
 
     <!-- Module 2: full-width student search; jersey image 1/3 + size and options 2/3 -->
     <section class="card module registration-card" id="module2" aria-labelledby="registrationTitle">
-      <div class="module-header"><span class="step alt">2</span><h2 id="registrationTitle">Thông tin học sinh & áo đấu</h2></div>
+      <div class="module-header"><h2 id="registrationTitle">Thông tin học sinh & áo đấu</h2></div>
       <div class="student-full">
         <label for="studentSearch">Họ và tên học sinh <strong style="color:#e66c85">*</strong></label>
         <div class="searchbox">
@@ -212,11 +239,11 @@
           <div class="suggestions" id="suggestions" role="listbox" aria-label="Danh sách gợi ý"></div>
         </div>
         <div class="selected" id="selectedName" aria-live="polite"></div>
-        <p class="fineprint" style="margin:1px 0 0">Tìm kiếm không dấu, có thể nhấn Enter khi chỉ có một kết quả phù hợp.</p>
       </div>
       <div class="jersey-layout">
         <aside class="jersey-photo" aria-label="Mẫu áo đấu">
-          <img src="<?= jerseyImage ?>" alt="Mẫu áo bóng đá xanh phối quần xanh đậm" onerror="this.style.display='none'">
+          <img id="jerseyImage" src="<?!= jerseyImage ?>" alt="Mẫu áo đấu ao_dau.jpg của lớp 2/12" onerror="this.hidden=true;document.getElementById('jerseyImageError').hidden=false;">
+          <p id="jerseyImageError" class="image-error" hidden>Chưa tải được ảnh áo đấu. Ban tổ chức kiểm tra quyền đọc file ao_dau.jpg trong Google Drive và triển khai lại ứng dụng.</p>
           <div class="jersey-caption"><b>MẪU ÁO ĐẤU CHÍNH THỨC</b><div class="price" id="price">147.000đ / bộ</div></div>
         </aside>
         <div class="jersey-details">
@@ -228,9 +255,8 @@
                 <tbody id="sizeRows"></tbody>
               </table>
             </div>
-            <p class="fineprint" style="margin:9px 0 0">* Size 1, 3, 15 chỉ có trong bảng tham khảo; chưa có trong các size áo đang bán. Nhà cung cấp chưa cung cấp chiều cao.</p>
             <details><summary>Xem ảnh bảng size gốc từ nhà cung cấp</summary>
-              <img src="<?= sizeImage ?>" alt="Ảnh bảng size áo trẻ em từ nhà cung cấp" onerror="this.style.display='none'">
+              <img src="<?!= sizeImage ?>" alt="Ảnh bảng size áo trẻ em từ nhà cung cấp" onerror="this.hidden=true;">
             </details>
           </div>
           <div class="size-picker">
@@ -245,17 +271,15 @@
             </div>
             <div class="field">
               <label for="printName">Tên in trên áo <span class="optional">(không bắt buộc)</span></label>
-              <input type="text" maxlength="40" id="printName" placeholder="Để trống sẽ tự lấy tên lót và tên">
+              <input type="text" maxlength="40" id="printName" placeholder="Để trống sẽ tự lấy 2 từ cuối họ tên">
             </div>
           </div>
-          <p class="fineprint" style="margin:9px 0 0">Ví dụ: Nguyễn Đình Lịch Khê → <b>Đình Lịch Khê</b>. Nếu không nhập, hệ thống tự điền vào danh sách đặt áo. Các bé <b>Thi đấu</b> không được trùng số áo.</p>
         </div>
       </div>
     </section>
 
     <!-- Module 3: full-width confirmation -->
     <section class="confirm-card" id="module3" aria-label="Xác nhận đăng ký">
-      <div class="module-header" style="margin-bottom:10px"><span class="step green">3</span><h2 style="margin:0;color:#10345d;font-size:20px">Xác nhận thông tin</h2></div>
       <div class="actions">
         <button type="button" class="primary" id="submitBtn">✓ Xác nhận đăng ký</button>
         <span class="submit-help" id="submissionHelp">Vui lòng chọn hình thức tham gia, tên bé, size và số áo.</span>
@@ -265,17 +289,16 @@
 
     <section class="tables">
       <div class="card table-card">
-        <div class="table-header"><div><h2><span class="step alt">4</span> Danh sách thi đấu</h2><div class="sub">Chỉ những bé đã chọn “Thi đấu”</div></div>
+        <div class="table-header"><div><h2>Danh sách thi đấu</h2><div class="sub">Chỉ những bé đã chọn “Thi đấu”</div></div>
           <button type="button" class="muted-btn" id="printAthletes">🖨 In danh sách</button></div>
         <div class="table-wrap"><table><thead><tr><th>STT</th><th>Họ tên học sinh</th><th>Số áo</th></tr></thead><tbody id="athletesBody"><tr><td colspan="3" class="empty">Đang tải...</td></tr></tbody></table></div>
       </div>
       <div class="card table-card order-card">
-        <div class="table-header"><div><h2><span class="step orange">5</span> Danh sách đặt áo</h2><div class="sub">Bao gồm bé thi đấu và bé cổ vũ</div></div>
+        <div class="table-header"><div><h2>Danh sách đặt áo</h2><div class="sub">Bao gồm bé thi đấu và bé cổ vũ</div></div>
           <button type="button" class="muted-btn" id="printOrders">🖨 In đơn áo</button></div>
         <div class="table-wrap"><table><thead><tr><th>STT</th><th>Họ tên</th><th>Tên in áo</th><th>Size</th><th>Số áo</th><th>Vai trò</th></tr></thead><tbody id="ordersBody"><tr><td colspan="6" class="empty">Đang tải...</td></tr></tbody></table></div>
       </div>
     </section>
-    <p class="sync-note"><span class="live-dot" aria-hidden="true"></span>Danh sách tự đồng bộ mỗi 30 giây khi đang mở trang · Sắp xếp theo tên gọi A–Z.</p>
     <footer class="footer">Thông tin đăng ký dành cho phụ huynh lớp 2/12. Không chia sẻ đường link ra ngoài nhóm lớp.</footer>
   </div>
 <script>
@@ -286,7 +309,7 @@
   let listRevision=0,pollInFlight=false;
   const formatMoney=n=>Number(n).toLocaleString('vi-VN')+'đ';
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const lastTwo=s=>String(s||'').trim().split(/\s+/).slice(1).join(' ')||String(s||'').trim();
+  const lastTwo=s=>String(s||'').trim().split(/\s+/).filter(Boolean).slice(-2).join(' ');
   const tokenKey=id=>'bongda-2-12:'+id;
   const readToken=id=>{try{return localStorage.getItem(tokenKey(id))||'';}catch(e){return '';}};
   const saveToken=(id,token)=>{try{localStorage.setItem(tokenKey(id),token);return true;}catch(e){return false;}};
@@ -315,7 +338,7 @@
   function renderChart(chart){
     $('sizeButtons').innerHTML=chart.filter(x=>x.available).map(x=>
       '<button type="button" class="size-btn" aria-pressed="false" data-size="'+esc(x.size)+'">'+esc(x.size)+'</button>').join('');
-    $('sizeRows').innerHTML=chart.map(x=>
+    $('sizeRows').innerHTML=chart.filter(x=>x.available).map(x=>
       '<tr class="'+(x.available?'':'unavailable')+'"><td>'+esc(x.size)+(x.available?'':' *')+'</td><td>'+esc(x.weight)+'</td><td>'+esc(x.length)+'</td><td>'+esc(x.chest)+'</td></tr>').join('');
     $('sizeButtons').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>setSize(b.dataset.size)));
   }
@@ -327,7 +350,7 @@
     size=value;
     document.querySelectorAll('.size-btn').forEach(b=>{const active=b.dataset.size===value;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
     const row=[...$('sizeRows').querySelectorAll('tr')].find(x=>x.firstElementChild.textContent.trim()===value);
-    $('sizeSelected').textContent=value?'Đã chọn size '+value+(row?' · '+row.children[1].textContent+' · dài '+row.children[2].textContent:''):'';
+    $('sizeSelected').textContent=value?'Đã chọn size '+value+(row && row.children[1].textContent!=='—'?' · '+row.children[1].textContent+' · dài '+row.children[2].textContent:''):'';
   }
   function clearChosen(){
     selected=null;editToken='';$('selectedName').textContent='';

@@ -12,7 +12,7 @@ const CFG = Object.freeze({
   jerseyImageId: '1ZRsAJOUB4ASQ6DFMd-pW0lNhWVC5UD93',
   sizeImageId: '19FmCI4RBG1WGtMCtg-ZmfUs1Ae8EH_6N',
   shirtPrice: 147000,
-  availableSizes: ['5','7','9','11','13'],
+  availableSizes: ['5','7','8','11','13'],
   allowedRoles: ['Thi đấu','Cổ vũ']
 });
 const REG_HEADERS = [
@@ -20,14 +20,12 @@ const REG_HEADERS = [
   'TEN_IN_AO','DON_GIA_VND','TAO_LUC','CAP_NHAT_LUC','EDIT_TOKEN_HASH'
 ];
 const SIZE_CHART = [
-  {size:'1', weight:'10 kg', length:'46 cm', chest:'62 cm'},
-  {size:'3', weight:'15 kg', length:'49 cm', chest:'68 cm'},
   {size:'5', weight:'20 kg', length:'52 cm', chest:'74 cm'},
   {size:'7', weight:'25 kg', length:'54 cm', chest:'78 cm'},
-  {size:'9', weight:'30 kg', length:'56 cm', chest:'82 cm'},
+  // Size 8 chưa có số đo trong ảnh từ nhà cung cấp; không lấy số đo của size 9.
+  {size:'8', weight:'—', length:'—', chest:'—'},
   {size:'11',weight:'35 kg', length:'58 cm', chest:'86 cm'},
-  {size:'13',weight:'40–45 kg',length:'60 cm',chest:'90 cm'},
-  {size:'15',weight:'>45 kg',length:'62 cm',chest:'94 cm'}
+  {size:'13',weight:'40–45 kg',length:'60 cm',chest:'90 cm'}
 ];
 
 function doGet() {
@@ -85,7 +83,7 @@ function submitRegistration(input) {
     const rawNumber=String(input.number===undefined?'':input.number).trim();
     if(!/^(?:[0-9]|[1-9][0-9])$/.test(rawNumber)) throw new Error('Số áo cần là số từ 0 đến 99.');
     const number=String(Number(rawNumber));
-    // Không bắt buộc nhập tên trên áo; tự lấy tên lót + tên từ danh sách lớp.
+    // Tên in áo không bắt buộc; nếu để trống tự lấy đúng hai từ cuối.
     const printName=String(input.printName||'').replace(/\s+/g,' ').trim() || suggestedPrintName_(student.name);
     if(printName.length<2 || printName.length>40 || /[<>\r\n]/.test(printName) || /^[=+@-]/.test(printName)) {
       throw new Error('Tên in áo cần 2–40 ký tự và không được bắt đầu bằng ký tự công thức.');
@@ -250,10 +248,10 @@ function writeSummary_(sh,headers,rows) {
   sh.autoResizeColumns(1,headers.length);
 }
 
-/** Tên in áo mặc định: bỏ họ đầu tiên, giữ nguyên dấu và tên lót. */
+/** Tên in áo mặc định: lấy đúng hai từ cuối và giữ dấu. */
 function suggestedPrintName_(fullName) {
   const parts=String(fullName||'').trim().split(/\s+/).filter(Boolean);
-  return parts.length>1 ? parts.slice(1).join(' ') : parts.join(' ');
+  return parts.slice(-2).join(' ');
 }
 
 function normalize_(s) {
@@ -266,12 +264,20 @@ function digest_(token) {
     Utilities.DigestAlgorithm.SHA_256,String(token||''),Utilities.Charset.UTF_8));
 }
 
+/**
+ * Nhúng ảnh Drive vào HTML dưới dạng base64 data URI; chỉ chấp nhận file ảnh.
+ */
 function imageDataUri_(fileId) {
   try {
     const blob=DriveApp.getFileById(fileId).getBlob();
-    return 'data:'+blob.getContentType()+';base64,'+Utilities.base64Encode(blob.getBytes());
-  } catch(err) {
-    console.error('Không tải được ảnh từ Drive: '+String(err));
+    let mime=String(blob.getContentType()||'').toLowerCase();
+    if(mime==='image/jpg') mime='image/jpeg';
+    if(!['image/jpeg','image/png','image/webp'].includes(mime)) throw new Error('Unsupported image type: '+mime);
+    const bytes=blob.getBytes();
+    if(bytes.length>2*1024*1024) throw new Error('Image too large to embed.');
+    return 'data:'+mime+';base64,'+Utilities.base64Encode(bytes);
+  } catch(error) {
+    console.error('Unable to read embedded image '+fileId+': '+String(error));
     return '';
   }
 }
