@@ -16,6 +16,8 @@ const CFG = Object.freeze({
   sizeImageId: '19FmCI4RBG1WGtMCtg-ZmfUs1Ae8EH_6N',
   paymentQrImageId: '1qHIar0aRKqAmg9v4OllzPYeWQ-n9jguz',
   shirtPrice: 150000,
+  athleteFee: 500000,
+  supporterFee: 150000,
   availableSizes: ['5','7','9','11','13'],
   allowedRoles: ['Thi đấu','Cổ vũ']
 });
@@ -131,7 +133,7 @@ function submitRegistration(input) {
       existing ? existing.paidMethod : '',
       existing ? existing.paidNote : '',
       existing ? existing.importNote : '',
-      (role==='Cổ vũ'?150000:400000)+extraCost
+      (role==='Cổ vũ'?CFG.supporterFee:CFG.athleteFee)+extraCost
     ];
     if(existing) {
       sh.getRange(existing.sheetRow,1,1,REG_HEADERS.length).setValues([values]);
@@ -169,11 +171,11 @@ function submitPaymentReport(input) {
     if(!enteredNumber || rec.number==='' || Number(enteredNumber)!==Number(rec.number)) {
       throw new Error('Số áo không khớp đăng ký. Vui lòng kiểm tra hoặc liên hệ ban tổ chức.');
     }
-    if(rec.paid) return {ok:true,verified:true,message:'Ban tổ chức đã xác nhận nhận tiền.'};
-    if(rec.paymentReported) return {ok:true,verified:false,message:'Đã ghi nhận thông báo trước đó. Ban tổ chức sẽ đối soát.'};
+    if(rec.paid) return {ok:true,verified:true,message:'Ban tổ chức đã xác nhận nhận tiền.',lists:getPublicLists()};
+    if(rec.paymentReported) return {ok:true,verified:false,message:'Đã ghi nhận thông báo trước đó. Ban tổ chức sẽ đối soát.',lists:getPublicLists()};
     sheet.getRange(rec.sheetRow,11,1,2).setValues([[true,new Date()]]);
     SpreadsheetApp.flush();
-    return {ok:true,verified:false,message:'Đã ghi nhận thông báo chuyển khoản, chờ ban tổ chức đối soát.'};
+    return {ok:true,verified:false,message:'Đã ghi nhận thông báo chuyển khoản, chờ ban tổ chức đối soát.',lists:getPublicLists()};
   } finally { lock.releaseLock(); }
 }
 
@@ -271,16 +273,32 @@ function collectLists_(ss) {
     .map((r,i)=>({...r,stt:i+1}));
   const mainOrders=main.filter(r=>CFG.allowedRoles.includes(r.role) && r.size)
     .map(r=>({name:r.name,printName:r.printName,size:r.size,number:r.number,
-      role:r.role,paid:r.paid,orderId:'MAIN-'+r.id,studentId:r.id}));
+      role:r.role,paid:r.paid,paymentReported:r.paymentReported,orderId:'MAIN-'+r.id,studentId:r.id}));
   const extraOrders=readExtraOrders_(ss.getSheetByName(CFG.extraJerseySheet))
     .filter(r=>r.quantity>0)
     .flatMap(r=>Array.from({length:r.quantity},(_,i)=>({
       name:r.name,printName:r.printName,size:r.size,number:r.number,
-      role:r.role,paid:r.paid,
+      role:r.role,paid:r.paid,paymentReported:false,
       orderId:r.orderId+(r.quantity>1?'-'+(i+1):''),studentId:r.studentId
     })));
   const allOrders=mainOrders.concat(extraOrders).sort(compareStudentNames_);
-  return {athletes,orders:allOrders.map((r,i)=>({...r,stt:i+1}))};
+  // 'Xác nhận' chỉ tính cầu thủ đã đăng ký áo, không tính tên có trong giấy.
+  const registeredIds=new Set(main.filter(r=>r.size && r.number!=='').map(r=>r.id));
+  const confirmedAthletes=[...athleteById.keys()].filter(id=>registeredIds.has(id)).length;
+  // Người cổ vũ tính theo đơn áo (không bao gồm cầu thủ thi đấu).
+  const supporterOrders=allOrders.filter(r=>r.role==='Cổ vũ');
+  const plannedTotal=athletes.length*CFG.athleteFee+supporterOrders.length*CFG.supporterFee;
+  // Thu thực tế chỉ được tính khi BQT tick PAID, không dựa trên tự khai.
+  const collectedMain=main.filter(r=>r.paid).reduce((sum,r)=>
+    sum+(r.paidAmount>0?Number(r.paidAmount):(r.role==='Cổ vũ'?CFG.supporterFee:CFG.athleteFee)),0);
+  const collectedExtras=readExtraOrders_(ss.getSheetByName(CFG.extraJerseySheet))
+    .filter(r=>r.paid).reduce((sum,r)=>sum+(r.price*r.quantity),0);
+  return {
+    athletes,orders:allOrders.map((r,i)=>({...r,stt:i+1})),
+    stats:{athletes:athletes.length,confirmed:confirmedAthletes,
+      supporters:supporterOrders.length,shirts:allOrders.length,
+      plannedTotal,collectedTotal:collectedMain+collectedExtras}
+  };
 }
 
 function readExtraOrders_(sh) {

@@ -344,6 +344,31 @@
     .tables .order-card th:first-child,.tables .order-card td:first-child{width:34px;text-align:center}
     .tables .order-card .paid-cell{min-width:62px}
 
+
+    /* V9: 4 cấp chữ thống nhất + tài chính và trạng thái chờ */
+    :root{--type-h1:clamp(22px,2.1vw,30px);--type-h2:clamp(17px,1.5vw,21px);--type-body:14px;--type-note:12px}
+    .hero h1{font-size:var(--type-h1)}
+    .card h2,.payment-heading h2{font-size:var(--type-h2)}
+    body{font-size:var(--type-body)}
+    .sub,.fineprint,.submit-help,.payment-qr-caption,.role-note{font-size:var(--type-note)}
+    .payment-lead strong{font-size:var(--type-h1);line-height:1.35}
+    .stat b{font-size:clamp(22px,2vw,29px)}
+    .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+    .stat{min-width:0}
+    .payment-explain{margin-top:0}
+    .fund-totals{display:grid;gap:9px;margin-top:6px}
+    .fund-totals>div{display:flex;justify-content:space-between;align-items:center;gap:12px;
+      background:#fff;border:1px solid #f2d5e3;border-radius:12px;padding:12px 13px}
+    .fund-totals span{font-size:var(--type-body);font-weight:700;color:#324f6e}
+    .fund-totals strong{font-size:clamp(17px,1.5vw,21px);color:#b0174a;white-space:nowrap}
+    .paid-check.is-reported{background:#fff1de;border-color:#e38c19;color:transparent}
+    @media(max-width:950px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:480px){
+      .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+      .stat{padding:11px}
+      .fund-totals>div{flex-wrap:wrap}
+      .fund-totals strong{white-space:normal}
+    }
 </style>
 </head>
 <body>
@@ -359,7 +384,8 @@
 
 
     <section class="stats" aria-label="Thống kê">
-      <div class="stat"><b id="countAthletes">0</b><span>Bé tham gia thi đấu</span></div>
+      <div class="stat"><b id="countAthletes">0</b><span>Đăng ký tham gia thi đấu</span></div>
+      <div class="stat"><b id="countConfirmed">0</b><span>Bé đã xác nhận tham gia</span></div>
       <div class="stat"><b id="countSupporters">0</b><span>Bộ áo cổ vũ</span></div>
       <div class="stat"><b id="countOrders">0</b><span>Bộ áo đã đăng ký</span></div>
     </section>
@@ -433,7 +459,7 @@
       <div class="payment-grid">
         <div class="payment-panel payment-panel-fund">
           <div class="payment-heading"><span class="payment-icon" aria-hidden="true">⚽</span><h2>Thông tin thu quỹ Bóng đá</h2></div>
-          <p class="payment-lead">Số tiền dự định thu <strong>400.000đ/bé</strong></p>
+          <p class="payment-lead">Số tiền dự định thu <strong>500.000đ/bé</strong></p>
           <div class="payment-fees">
             <div class="payment-fee"><span>👕 Áo đấu</span><strong>150.000đ / bộ</strong></div>
             <div class="payment-fee"><span>🏟️ Thuê sân tập, ăn nhẹ, nước uống<small class="fee-sub">Dự kiến 2 buổi tập</small></span><strong>1.000.000đ / buổi</strong></div>
@@ -442,6 +468,10 @@
           <div class="payment-explain">
             <p><span aria-hidden="true">✨</span> Khoản dư sau giải sẽ được hoàn trả hoặc mua quà kỷ niệm cho bé.</p>
             <p><span aria-hidden="true">📣</span> Phụ huynh đăng ký áo đấu để <b>cổ vũ chỉ đóng 150.000đ / bộ.</b></p>
+          </div>
+          <div class="fund-totals" aria-live="polite">
+            <div><span>Tổng tiền dự kiến</span><strong id="plannedTotal">0đ</strong></div>
+            <div><span>Tổng tiền thực thu (đã đối soát)</span><strong id="collectedTotal">0đ</strong></div>
           </div>
         </div>
 
@@ -557,17 +587,21 @@
   }
   function renderLists(data){
     lists=data||{athletes:[],orders:[]};
-    $('countAthletes').textContent=lists.athletes.length;
-    $('countOrders').textContent=lists.orders.length;
-    $('countSupporters').textContent=lists.orders.filter(r=>r.role==='Cổ vũ').length;
+    const stats=lists.stats||{};
+    $('countAthletes').textContent=stats.athletes??lists.athletes.length;
+    $('countConfirmed').textContent=stats.confirmed??0;
+    $('countOrders').textContent=stats.shirts??lists.orders.length;
+    $('countSupporters').textContent=stats.supporters??lists.orders.filter(r=>r.role==='Cổ vũ').length;
+    $('plannedTotal').textContent=formatMoney(stats.plannedTotal||0);
+    $('collectedTotal').textContent=formatMoney(stats.collectedTotal||0);
     $('athletesBody').innerHTML=lists.athletes.length?lists.athletes.map(r=>
       '<tr><td>'+r.stt+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.number)+'</td></tr>').join(''):
       '<tr><td colspan="3" class="empty">Chưa có bé đăng ký thi đấu</td></tr>';
     $('ordersBody').innerHTML=lists.orders.length?lists.orders.map(r=>
       '<tr><td>'+r.stt+'</td><td>'+esc(r.name)+'</td>'+
       '<td>'+esc(r.printName)+'</td><td>'+esc(r.size)+'</td><td>'+esc(r.number)+'</td>'+
-      '<td>'+esc(r.role)+'</td><td class="paid-cell"><span class="paid-check '+(r.paid?'is-paid':'')+'" '+
-      'aria-label="'+(r.paid?'Đã thu tiền':'Chưa xác nhận thu tiền')+'">'+(r.paid?'✓':'')+'</span></td></tr>').join(''):
+      '<td>'+esc(r.role)+'</td><td class="paid-cell"><span class="paid-check '+(r.paid?'is-paid':(r.paymentReported?'is-reported':''))+'" '+
+      'aria-label="'+(r.paid?'Đã xác nhận thu tiền':(r.paymentReported?'Phụ huynh báo đã chuyển, chờ đối soát':'Chưa báo chuyển khoản'))+'">'+(r.paid?'✓':'')+'</span></td></tr>').join(''):
       '<tr><td colspan="7" class="empty">Chưa có đơn đặt áo</td></tr>';
   }
   function renderChart(chart){
@@ -683,6 +717,7 @@
           'Ban tổ chức đã xác nhận thu tiền.':
           'Đã báo chuyển khoản · Chờ ban tổ chức đối soát.';
       }
+      if(res.lists){listRevision++;renderLists(res.lists);}
       message(res.message,'success');
     });
   });
