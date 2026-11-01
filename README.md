@@ -77,6 +77,17 @@ Giao diện dùng **Be Vietnam Pro** qua Google Fonts (fallback Arial khi offlin
 - Sheet `DOI_THI_DAU` được dùng lâu dài làm nguồn cầu thủ đăng ký trực tiếp. Không thêm các em chưa mua áo vào `DANG_KY` vì như vậy sẽ tạo đơn ảo.
 - Cập nhật code trên `main`, chạy `clasp push`, rồi triển khai phiên bản Web App mới; **không chạy lại setup/import dữ liệu**. Không đổi các checkbox đã thu tiền.
 
+## V9 — 4 chỉ số & đối soát quỹ
+- Lâm Gia Minh đổi **Thi đấu**, giữ áo chính size 7/số 21. Đơn em bé đã được **xóa** theo yêu cầu; Cô Ngọc và Chấn Hưng là hai đơn **Cổ vũ** còn lại.
+- Phí dự kiến đổi thành **500.000đ/cầu thủ** và **150.000đ/bộ cổ vũ**. Tính kế hoạch theo số bé có tên trong đội tuyển hợp nhất và các đơn áo chỉ Cổ vũ: `14 × 500.000 + 2 × 150.000 = 7.300.000đ`. Đây là mức **dự kiến**, chưa trừ chi phí hay phản ánh tiền đã thu.
+- Thống kê đầu trang có **4 ô**: Đăng ký tham gia thi đấu (14), Bé đã xác nhận tham gia (9 bé trong đội tuyển có đăng ký áo), Bộ áo cổ vũ (2), Bộ áo đã đăng ký (11). Tên học sinh chỉ có trong giấy vẫn là đăng ký dự kiến, chưa xác nhận.
+- Trong Web App, trạng thái **ô trắng** khi chưa báo, **ô cam không tick** khi phụ huynh đã báo chuyển `DANG_KY!K`, **✓ xanh lá** khi ban tổ chức tick đã thu tại `DANG_KY!M` hoặc `AO_BO_SUNG!H`. Ưu tiên ✓ xanh khi cả K/M đều đúng.
+- Nút báo đã đóng của phụ huynh chỉ ghi cột K/L, tuyệt đối không ghi M hoặc PAID_AMOUNT; báo cáo tổng tiền thực thu chỉ đếm những hàng đã được admin xác nhận ở M/H. Nếu O=PAID_AMOUNT có giá trị dương thì lấy số thực nhận; nếu admin tick M nhưng chưa ghi số, dùng **mức chuẩn theo vai trò** (500k Thi đấu; 150k Cổ vũ).
+- Ảnh chụp Sheet cho thấy Khê có cả K/M = TRUE và O còn rỗng; theo quy tắc hiện tại, tiền thực thu ghi nhận **500.000đ**, dấu ✓ xanh.
+- Khối thông báo hoàn dư/quà và cổ vũ được đẩy lên ngay sau các khoản chi; cuối cột trái là **Tổng tiền dự kiến** và **Tổng tiền thực thu** tự tính.
+- 4 cấp kích thước chữ: h1, h2, body, caption; các ô thống kê responsive 4 cột desktop, 2 cột tablet/mobile. Phần đặt áo/thu quỹ vẫn thích nghi với khổ màn hình khác nhau.
+- Sau khi `clasp push` và deploy New version, dữ liệu Google Sheets đã được cập nhật trực tiếp, không chạy lại setup. Để tab `DS_DAT_AO` đồng bộ ngay khi tick M, cần `installPaymentEditTrigger()` (nếu chưa cài); Web App tự đọc lại sau 30 giây.
+
 ## Nguồn dữ liệu
 - [Google Sheet DA_BONG_2_12](https://docs.google.com/spreadsheets/d/1hZc7Xvpy2jfBRZZF0o07msk6zc6TgZBst4PDrC4fdtk/edit), tab `DANH SACH HOC SINH` có 43 em vào thời điểm khảo sát.
 - [Ảnh áo đấu](https://drive.google.com/file/d/1ZRsAJOUB4ASQ6DFMd-pW0lNhWVC5UD93/view)
