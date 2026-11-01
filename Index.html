@@ -717,6 +717,7 @@
           'Ban tổ chức đã xác nhận thu tiền.':
           'Đã báo chuyển khoản · Chờ ban tổ chức đối soát.';
       }
+      if(res.lists){listRevision++;renderLists(res.lists);}
       message(res.message,'success');
     });
   });
