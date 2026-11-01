@@ -20,15 +20,12 @@ const REG_HEADERS = [
   'TEN_IN_AO','DON_GIA_VND','TAO_LUC','CAP_NHAT_LUC','EDIT_TOKEN_HASH'
 ];
 const SIZE_CHART = [
-  {size:'1', weight:'10 kg', length:'46 cm', chest:'62 cm'},
-  {size:'3', weight:'15 kg', length:'49 cm', chest:'68 cm'},
   {size:'5', weight:'20 kg', length:'52 cm', chest:'74 cm'},
   {size:'7', weight:'25 kg', length:'54 cm', chest:'78 cm'},
   // Size 8 chưa có số đo trong ảnh từ nhà cung cấp; không lấy số đo của size 9.
   {size:'8', weight:'—', length:'—', chest:'—'},
   {size:'11',weight:'35 kg', length:'58 cm', chest:'86 cm'},
-  {size:'13',weight:'40–45 kg',length:'60 cm',chest:'90 cm'},
-  {size:'15',weight:'>45 kg',length:'62 cm',chest:'94 cm'}
+  {size:'13',weight:'40–45 kg',length:'60 cm',chest:'90 cm'}
 ];
 
 function doGet() {
