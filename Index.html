@@ -249,6 +249,62 @@
       .jersey-photo .price{font-size:21px}
     }
 
+
+    /* V5: Fund notice and bank QR — full-width module between hero and statistics. */
+    .payment-module{
+      margin:16px 0 20px;border-top:5px solid #f26b9f;
+      padding:clamp(16px,2.3vw,26px);
+      background:linear-gradient(112deg,#fff8fc 0%,#fff 54%,#f3fbff 100%);
+    }
+    .payment-grid{
+      display:grid;grid-template-columns:minmax(0,1.13fr) minmax(0,1fr);
+      gap:clamp(12px,1.7vw,22px);align-items:stretch
+    }
+    .payment-panel{
+      min-width:0;min-height:0;padding:clamp(16px,2.1vw,25px);
+      border-radius:18px;border:1px solid #e6e8f2;background:#fff;
+      display:flex;flex-direction:column;gap:13px
+    }
+    .payment-panel-fund{border-color:#f2d5e3;background:linear-gradient(145deg,#fffafd,#fff)}
+    .payment-panel-bank{border-color:#d2e8f7;background:linear-gradient(145deg,#fafdff,#fff)}
+    .payment-heading{display:flex;align-items:center;gap:9px}
+    .payment-icon{font-size:24px;line-height:1}
+    .payment-heading h2{font-size:clamp(17px,1.9vw,23px);font-weight:900;margin:0;color:var(--navy);line-height:1.4}
+    .payment-lead{margin:2px 0 0;color:#a11845;font-weight:700;font-size:clamp(14px,1.6vw,18px)}
+    .payment-lead strong{display:block;color:#bb123d;font-size:clamp(26px,3vw,36px);font-weight:900;line-height:1.5}
+    .payment-fees{display:flex;flex-direction:column;gap:10px}
+    .payment-fee{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+      border-radius:13px;background:#fff;border:1px solid #f2e2e9;padding:13px 15px}
+    .payment-fee span{font-weight:650;color:#344a64}
+    .payment-fee strong{color:#a31f47;font-weight:850;white-space:nowrap}
+    .payment-explain{margin-top:auto;border-radius:13px;background:#fff0f6;border:1px solid #f4d3e1;padding:12px 16px}
+    .payment-explain p{margin:0 0 10px;font-size:13px;color:#46536a;line-height:1.8}
+    .payment-explain p:last-child{margin-bottom:0}
+    .payment-explain b{color:#a61647}
+    .bank-facts{display:grid;gap:8px}
+    .bank-facts>div{display:grid;grid-template-columns:minmax(112px,.65fr) minmax(0,1fr);
+      gap:8px;padding:9px 12px;border:1px solid #deebf6;background:#f3faff;border-radius:11px;align-items:center}
+    .bank-label{color:#61738c;font-size:12px;font-weight:700}
+    .bank-facts strong{overflow-wrap:anywhere;font-size:13px;color:#11395d;font-weight:800}
+    .bank-facts .bank-number{font-size:18px;letter-spacing:.4px;color:#a3133d}
+    .bank-transfer-label{font-size:12px;font-weight:800;color:#3c5972}
+    .bank-reference{font-size:13px;font-weight:800;overflow-wrap:anywhere;color:#93466c;
+      border:1px dashed #d2a5be;border-radius:11px;padding:11px 13px;background:#fff4fa}
+    .payment-qr-area{display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:5px;margin-top:auto}
+    .payment-qr-source{display:none!important}
+    .payment-qr-canvas{display:block;width:min(100%,258px);height:auto;aspect-ratio:924/1012;
+      border-radius:13px;border:1px solid #e9ced9;background:white;padding:4px}
+    .payment-qr-error{font-size:12px;color:#a02a3e;text-align:center}
+    .payment-qr-caption{font-size:12px;font-weight:700;color:#6d8298;text-align:center;margin:2px 0 0}
+    @media(max-width:900px){.payment-grid{grid-template-columns:1fr}.payment-panel{height:auto}}
+    @media(max-width:430px){
+      .payment-module{padding:12px}
+      .payment-panel{padding:14px}
+      .bank-facts>div{grid-template-columns:1fr;gap:2px}
+      .payment-lead strong{font-size:26px}
+    }
+
 </style>
 </head>
 <body>
@@ -261,6 +317,43 @@
         <span class="crest-fallback" hidden>⚽</span>
       </div>
     </header>
+
+
+    <!-- Quỹ bóng đá: 2 cột chi phí & chuyển khoản, ngay sau header. -->
+    <section class="card payment-module" aria-label="Thông tin thu quỹ và chuyển khoản">
+      <div class="payment-grid">
+        <div class="payment-panel payment-panel-fund">
+          <div class="payment-heading"><span class="payment-icon" aria-hidden="true">⚽</span><h2>Thông tin thu quỹ Bóng đá</h2></div>
+          <p class="payment-lead">Số tiền dự định thu <strong>400.000đ/bé</strong></p>
+          <div class="payment-fees">
+            <div class="payment-fee"><span>👕 Áo đấu</span><strong>150.000đ / bộ</strong></div>
+            <div class="payment-fee"><span>🏟️ Thuê sân, ăn nhẹ, nước uống</span><strong>100.000đ / buổi</strong></div>
+          </div>
+          <div class="payment-explain">
+            <p><span aria-hidden="true">✨</span> Khoản dư sau giải sẽ được hoàn trả hoặc mua quà kỷ niệm cho bé.</p>
+            <p><span aria-hidden="true">📣</span> Phụ huynh đăng ký áo đấu để <b>cổ vũ chỉ đóng 150.000đ / bộ.</b></p>
+          </div>
+        </div>
+
+        <div class="payment-panel payment-panel-bank">
+          <div class="payment-heading"><span class="payment-icon" aria-hidden="true">🏦</span><h2>Thông tin chuyển khoản</h2></div>
+          <div class="bank-facts">
+            <div><span class="bank-label">Tên tài khoản</span><strong><?= bankAccountName ?></strong></div>
+            <div><span class="bank-label">Số tài khoản</span><strong class="bank-number"><?= bankAccountNumber ?></strong></div>
+            <div><span class="bank-label">Ngân hàng</span><strong><?= bankName ?></strong></div>
+          </div>
+          <div class="bank-transfer-label">Nội dung chuyển khoản</div>
+          <div class="bank-reference" id="paymentReference" aria-live="polite">[Tên bé] - Lớp 2/12 - Đóng quỹ bóng đá</div>
+          <div class="payment-qr-area">
+            <img id="paymentQrSource" class="payment-qr-source" src="<?!= paymentQrImage ?>" alt="" aria-hidden="true">
+            <canvas id="paymentQrCanvas" class="payment-qr-canvas" width="924" height="1012" role="img"
+              aria-label="Mã QR VPBank để quét chuyển khoản"></canvas>
+            <p id="paymentQrError" class="payment-qr-error" hidden>Chưa thể hiển thị mã QR. Vui lòng chuyển khoản theo thông tin bên trên.</p>
+            <p class="payment-qr-caption">Quét mã QR để chuyển khoản</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <section class="stats" aria-label="Thống kê">
       <div class="stat"><b id="countAthletes">0</b><span>Bé tham gia thi đấu</span></div>
@@ -298,7 +391,7 @@
         <aside class="jersey-photo" aria-label="Mẫu áo đấu">
           <img id="jerseyImage" src="<?!= jerseyImage ?>" alt="Mẫu áo đấu ao_dau.jpg của lớp 2/12" onerror="this.hidden=true;document.getElementById('jerseyImageError').hidden=false;">
           <p id="jerseyImageError" class="image-error" hidden>Chưa tải được ảnh áo đấu. Ban tổ chức kiểm tra quyền đọc file ao_dau.jpg trong Google Drive và triển khai lại ứng dụng.</p>
-          <div class="jersey-caption"><b>MẪU ÁO ĐẤU CHÍNH THỨC</b><div class="price" id="price">147.000đ / bộ</div></div>
+          <div class="jersey-caption"><b>MẪU ÁO ĐẤU CHÍNH THỨC</b><div class="price" id="price">150.000đ / bộ</div></div>
         </aside>
         <div class="jersey-details">
           <div class="size-guide">
@@ -367,6 +460,44 @@
   const tokenKey=id=>'bongda-2-12:'+id;
   const readToken=id=>{try{return localStorage.getItem(tokenKey(id))||'';}catch(e){return '';}};
   const saveToken=(id,token)=>{try{localStorage.setItem(tokenKey(id),token);return true;}catch(e){return false;}};
+
+  function updatePaymentReference(name){
+    $('paymentReference').textContent=(name || '[Tên bé]')+' - Lớp 2/12 - Đóng quỹ bóng đá';
+  }
+
+  /**
+   * Crop QR-only from Ma_QR.jpg without regenerating QR data.
+   * Source image: 1254x2560; bounds (166,492)-(1090,1504), verified decodable.
+   * The crop contains QR + its quiet area, excluding account text / banking app ad.
+   */
+  function renderPaymentQr(){
+    const img=$('paymentQrSource'),canvas=$('paymentQrCanvas'),msg=$('paymentQrError');
+    if(!img || !canvas)return;
+    function draw(){
+      try{
+        if(!img.naturalWidth || !img.naturalHeight)throw Error('Ảnh QR không có dữ liệu.');
+        const ctx=canvas.getContext('2d');
+        if(!ctx)throw Error('Trình duyệt không hỗ trợ canvas.');
+        const sx=img.naturalWidth/1254,sy=img.naturalHeight/2560;
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.drawImage(img,166*sx,492*sy,924*sx,1012*sy,0,0,924,1012);
+        msg.hidden=true;
+      }catch(e){
+        console.warn('QR render error',e);
+        canvas.hidden=true;msg.hidden=false;
+      }
+    }
+    img.addEventListener('load',draw);
+    img.addEventListener('error',()=>{
+      canvas.hidden=true;msg.hidden=false;
+    });
+    if(img.complete){
+      if(img.naturalWidth)draw();
+      else if(img.getAttribute('src')){canvas.hidden=true;msg.hidden=false;}
+    }
+  }
+  renderPaymentQr();
+
   function message(text,type){
     const el=$('message');el.textContent=text;el.className='notice '+(type||'');el.scrollIntoView({behavior:'smooth',block:'nearest'});
   }
@@ -408,13 +539,14 @@
     $('sizeSelected').textContent=value?'Đã chọn size '+value+(row && row.children[1].textContent!=='—'?' · '+row.children[1].textContent+' · dài '+row.children[2].textContent:''):'';
   }
   function clearChosen(){
-    selected=null;editToken='';$('selectedName').textContent='';
+    selected=null;editToken='';$('selectedName').textContent='';updatePaymentReference('');
     $('printName').value='';$('jerseyNumber').value='';setSize('');
     $('submitBtn').disabled=false;$('submissionHelp').textContent='Vui lòng chọn học sinh, vai trò, size và số áo.';
   }
   function chooseStudent(s){
     selected=s;results=[];searchSequence++;clearTimeout(searchTimer);$('suggestions').innerHTML='';$('studentSearch').value=s.name;
     $('selectedName').textContent='✓ Đã chọn: '+s.name;
+    updatePaymentReference(s.name);
     $('printName').value=''; // Tên in áo là tùy chọn; máy chủ tự lấy tên lót + tên nếu để trống.
     editToken=readToken(s.id);
     server('getMyRegistration',[s.id,editToken],response=>{
