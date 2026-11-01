@@ -2,6 +2,17 @@
 
 Web App dành cho phụ huynh lớp 2/12: chọn **Thi đấu / Cổ vũ**, áo bóng đá, size, số áo và tên in trên áo; lưu về Google Sheets hiện có.
 
+## Giao diện V2 — responsive
+Giữ nguyên hero và 3 ô thống kê. Các module theo thứ tự:
+1. **Hình thức tham gia:** hai lựa chọn Thi đấu/Cổ vũ nằm ngang, full-width.
+2. **Thông tin học sinh & áo:** tìm tên full-width; ảnh áo **1/3 trái** và bảng size **2/3 phải** ở desktop; bên dưới bảng là nút chọn size, số áo, tên in áo. Trên điện thoại khung áo và thông tin xếp dọc.
+3. **Xác nhận:** nút lưu trên một khối riêng, nút chạm lớn.
+4. **Danh sách thi đấu:** chỉ những bé Thi đấu, có nút in.
+5. **Danh sách đặt áo:** cả bé Thi đấu/Cổ vũ, có nút in.
+
+Giao diện dùng **Be Vietnam Pro** qua Google Fonts (fallback Arial khi offline), màu xanh ngọc / xanh dương / tím / cam hồng, các kích thước responsive theo desktop/tablet/mobile. **Không cần nút Cập nhật**: sau khi đăng ký, dữ liệu cập nhật ngay; khi trang đang mở và còn hiển thị, hệ thống đồng bộ danh sách từ Sheets mỗi **30 giây**, đồng thời làm mới khi trở lại tab. Không cần tải lại trang.
+
+
 ## Nguồn dữ liệu
 - [Google Sheet DA_BONG_2_12](https://docs.google.com/spreadsheets/d/1hZc7Xvpy2jfBRZZF0o07msk6zc6TgZBst4PDrC4fdtk/edit), tab `DANH SACH HOC SINH` có 43 em vào thời điểm khảo sát.
 - [Ảnh áo đấu](https://drive.google.com/file/d/1ZRsAJOUB4ASQ6DFMd-pW0lNhWVC5UD93/view)
@@ -20,7 +31,7 @@ Giá mẫu áo **147.000đ/bộ**; các size bán theo ảnh là **5, 7, 9, 11, 
 
 1. Cài Node.js và `npm install -g @google/clasp`.
 2. `git clone https://github.com/Nguyennth19/bong_da_2_12.git`
-3. `cd bong_da_2_12 && git checkout feat/registration-webapp-v1`
+3. `cd bong_da_2_12 && git checkout main`
 4. `clasp login` bằng tài khoản có quyền sửa Sheet và đọc hai ảnh.
 5. Nếu **đã có project Apps Script**, copy `.clasp.example.json` thành `.clasp.json`; thay `DAN_SCRIPT_ID_CUA_BAN` bằng Script ID trong **Project Settings**.
 6. Nếu **chưa có project**, dùng `clasp create --type standalone --title "Dang ky bong da 2-12"` trong thư mục repo (lệnh tạo `.clasp.json`). Kiểm tra file trước khi push.
@@ -50,7 +61,7 @@ Danh sách in **xếp theo tên gọi cuối A–Z** (quy ước xếp tên ph�
 
 ## Quy tắc V1
 - Không có checkbox mua áo: mỗi lượt đăng ký phải điền đầy đủ thông tin một bộ áo.
-- Tên in áo mặc định lấy **tên lót + tên** (bỏ họ đầu tiên), có thể sửa.
+- **Tên in áo không bắt buộc.** Nếu để trống, máy chủ tự lấy **tên lót + tên** (bỏ họ đầu tiên) để ghi vào DS_DAT_AO; nếu phụ huynh nhập, giữ nguyên tên đã nhập.
 - Một học sinh chỉ có một bản ghi; đăng ký lại trên **cùng trình duyệt** có mã lưu cục bộ thì cập nhật bản ghi.
 - Thiết bị khác không có mã sửa sẽ không ghi đè dữ liệu đã đăng ký; cần liên hệ ban tổ chức.
 - Số áo 0–99; **không được trùng giữa hai học sinh Thi đấu**.
