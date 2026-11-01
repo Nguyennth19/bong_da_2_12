@@ -340,6 +340,11 @@
     .paid-check.is-paid{background:#e2f6e9;border-color:#0a9f50;color:#058a41}
     @media(max-width:900px){.tables{grid-template-columns:1fr;gap:17px}}
     @media(max-width:430px){.tables .order-card table{font-size:11px}.tables .order-card{padding:13px}}
+
+    /* Giữ giá trị trong cột STT và check gọn ngay cả khi bảng bị thu nhỏ. */
+    .tables .order-card th:first-child,.tables .order-card td:first-child{width:34px;text-align:center}
+    .tables .order-card .paid-cell{min-width:62px}
+
 </style>
 </head>
 <body>
@@ -569,7 +574,7 @@
   function renderChart(chart){
     $('sizeButtons').innerHTML=chart.filter(x=>x.available).map(x=>
       '<button type="button" class="size-btn" aria-pressed="false" data-size="'+esc(x.size)+'">'+esc(x.size)+'</button>').join('');
-    // Bảng tham khảo chỉ hiện size có số đo thực tế; size 8 vẫn có thể được chọn đặt áo.
+    // Chỉ hiển thị size có số đo được nhà cung cấp xác nhận.
     $('sizeRows').innerHTML=chart.filter(x=>x.available && x.weight!=='—').map(x=>
       '<tr class="'+(x.available?'':'unavailable')+'"><td>'+esc(x.size)+(x.available?'':' *')+'</td><td>'+esc(x.weight)+'</td><td>'+esc(x.length)+'</td><td>'+esc(x.chest)+'</td></tr>').join('');
     $('sizeButtons').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>setSize(b.dataset.size)));
