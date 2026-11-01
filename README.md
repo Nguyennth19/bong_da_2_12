@@ -88,6 +88,14 @@ Giao diện dùng **Be Vietnam Pro** qua Google Fonts (fallback Arial khi offlin
 - 4 cấp kích thước chữ: h1, h2, body, caption; các ô thống kê responsive 4 cột desktop, 2 cột tablet/mobile. Phần đặt áo/thu quỹ vẫn thích nghi với khổ màn hình khác nhau.
 - Sau khi `clasp push` và deploy New version, dữ liệu Google Sheets đã được cập nhật trực tiếp, không chạy lại setup. Để tab `DS_DAT_AO` đồng bộ ngay khi tick M, cần `installPaymentEditTrigger()` (nếu chưa cài); Web App tự đọc lại sau 30 giây.
 
+## V10 — thay đổi thông báo dự kiến thu (01/11/2026)
+- Mức dự kiến thu dành cho bé thi đấu: **1.000.000đ/bé** (trước: 500.000đ). Mức áo cổ vũ vẫn **150.000đ/bộ**.
+- Thuê sân tập + HLV HDF: **7.000.000đ / 4 buổi**.
+- Chi phí khác: **Nước uống, ăn nhẹ** (4 buổi tập + tối thiểu 3 trận đấu); khoản 300.000đ/trận đang chỉ là ước tính cho chi phí khác.
+- Với 14 bé trong đội tuyển và 2 bộ áo cổ vũ, tổng tiền dự kiến: **14.300.000đ**.
+- Đã cập nhật cột `EXPECTED_PAYMENT` trên 10 hồ sơ hiện có trong `DANG_KY`; không đổi `PAID`, `PAYMENT_REPORTED` hay `PAID_AMOUNT`.
+- **Quan trọng về đối soát:** nếu `PAID=TRUE` nhưng `PAID_AMOUNT` trống, backend hiện suy giá trị theo phí chuẩn mới; để báo cáo *thực thu* chính xác, ban tổ chức cần điền `PAID_AMOUNT` theo giao dịch ngân hàng. Không coi mức dự kiến mới là bằng chứng đã nhận thêm tiền.
+
 ## Nguồn dữ liệu
 - [Google Sheet DA_BONG_2_12](https://docs.google.com/spreadsheets/d/1hZc7Xvpy2jfBRZZF0o07msk6zc6TgZBst4PDrC4fdtk/edit), tab `DANH SACH HOC SINH` có 43 em vào thời điểm khảo sát.
 - [Ảnh áo đấu](https://drive.google.com/file/d/1ZRsAJOUB4ASQ6DFMd-pW0lNhWVC5UD93/view)
