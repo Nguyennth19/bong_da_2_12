@@ -7,6 +7,21 @@
 - Confirm tabs `DANG_KY`, `DS_THI_DAU`, `DS_DAT_AO` exist and headers are correct.
 - Deploy as a Web App, execute as owner, restrict audience to the class's Google-account users.
 
+## V2 layout and live update acceptance
+- [ ] Hero và thống kê ở đầu giữ nguyên nội dung và bố cục cũ.
+- [ ] Module 1 đứng trước module 2; Thi đấu và Cổ vũ trong một hàng trên desktop.
+- [ ] Module 2: ô tìm tên full-width, ảnh áo 1/3 bên trái, bảng size 2/3 bên phải.
+- [ ] Thứ tự khung phải: bảng size -> chọn size -> số áo & tên in áo.
+- [ ] Module 3 là khối xác nhận; module 4 thi đấu và module 5 đặt áo vẫn có nút in.
+- [ ] Font Be Vietnam Pro có tải được trên môi trường online; khi bị chặn vẫn dùng Arial.
+- [ ] Kiểm tra màn hình 360px, 390px, 768px, 1024px và 1440px; không tràn ngang, mọi nút bấm dễ thao tác.
+- [ ] Chọn Thi đấu trước rồi mới tìm tên bé: lựa chọn Thi đấu không bị xóa khi đang gõ.
+- [ ] Không nhập tên in áo, chọn Nguyễn Đình Lịch Khê: bảng DS_DAT_AO lưu **Đình Lịch Khê**.
+- [ ] Nhập tên in áo tùy chọn: bảng DS_DAT_AO giữ đúng tên phụ huynh nhập.
+- [ ] Có hai trình duyệt A và B: A thêm đăng ký, B tự hiện trong danh sách tối đa khoảng 30 giây khi đang mở (không cần bấm Cập nhật).
+- [ ] Không còn nút “Cập nhật hai danh sách”; sau khi lưu, danh sách và thống kê cập nhật ngay.
+- [ ] Bảng thi đấu và bảng đặt áo vẫn xếp theo tên gọi A–Z và đánh lại STT.
+
 ## Functional acceptance checklist
 - [ ] Search `lich khe` and select `Nguyễn Đình Lịch Khê`; no accent required.
 - [ ] Search `khang`; multiple suggestions appear; Enter does **not** guess one.
