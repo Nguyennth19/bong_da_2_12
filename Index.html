@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <style>
+    :root{--navy:#10345d;--blue:#0a73b8;--sky:#e9f6ff;--ink:#17293d;--muted:#607188;--line:#dbe7f1;--green:#177c59;--warn:#a15e04;--bg:#f3f8fc}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--ink);line-height:1.45}
+    button,input{font:inherit}
+    button{cursor:pointer}
+    button:disabled{cursor:not-allowed;opacity:.48}
+    .container{max-width:1180px;margin:0 auto;padding:24px 18px 60px}
+    .hero{background:linear-gradient(115deg,#0e3059,#106dae);color:white;padding:30px 32px;border-radius:22px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+    .hero h1{margin:3px 0 8px;font-size:clamp(25px,3.8vw,37px);letter-spacing:-.6px}
+    .hero p{margin:0;color:#d5eefa}
+    .tag{display:inline-block;border:1px solid #87cef0;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:bold;letter-spacing:.7px}
+    .crest{font-size:54px;line-height:1}
+    .stats{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0 24px}
+    .stat{flex:1;min-width:125px;border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px 16px}
+    .stat b{display:block;font-size:24px;color:var(--navy)}
+    .stat span{font-size:12px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+    .card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 4px 20px #17457308}
+    .card h2{font-size:19px;margin:0 0 14px;color:var(--navy)}
+    .step{display:inline-grid;place-items:center;background:#d9f0ff;color:#08659b;width:28px;height:28px;border-radius:50%;font-size:14px;margin-right:5px}
+    .sub{font-size:13px;color:var(--muted);margin:0 0 13px}
+    label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+    input[type=text],input[type=number]{width:100%;min-height:45px;padding:12px 13px;border-radius:10px;border:1px solid #bacddd;background:#fff;color:var(--ink)}
+    input:focus{outline:2px solid #98d8fa;outline-offset:1px;border-color:var(--blue)}
+    .field{margin-bottom:16px}
+    .searchbox{position:relative}
+    .suggestions{position:absolute;top:100%;left:0;right:0;z-index:12;max-height:250px;overflow-y:auto;background:#fff;border:1px solid var(--line);border-radius:0 0 12px 12px;box-shadow:0 10px 25px #00142b1f}
+    .suggestions:empty{display:none}
+    .suggestions button{display:block;padding:11px 12px;background:#fff;border:0;border-bottom:1px solid #e7eff6;width:100%;text-align:left;color:var(--navy)}
+    .suggestions button:hover,.suggestions button:focus{background:#eaf6ff}
+    .selected{font-size:13px;color:var(--green);min-height:18px;margin-top:6px}
+    .roles{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .role,.size-btn{background:#fff;border:1px solid #c4d5e3;border-radius:11px;padding:13px 11px;font-weight:700;color:var(--navy)}
+    .role.active,.size-btn.active{background:#e9f6ff;border:2px solid var(--blue);color:#095a8b}
+    .role small{display:block;color:var(--muted);font-weight:400;margin-top:3px}
+    .jersey-card{margin-top:18px}
+    .jersey-layout{display:grid;grid-template-columns:38% 1fr;gap:22px}
+    .jersey-photo{background:#f4f9ff;border:1px solid var(--line);border-radius:15px;overflow:hidden;align-self:start}
+    .jersey-photo img{width:100%;display:block;object-fit:contain}
+    .jersey-caption{padding:12px;text-align:center;font-size:12px;color:var(--muted)}
+    .price{font-size:23px;color:var(--navy);font-weight:800;margin-top:3px}
+    .sizes{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin:12px 0}
+    .size-btn{padding:9px 4px}
+    .size-row{font-size:12px;color:var(--muted);margin:3px 0 8px}
+    .size-selected{font-size:13px;color:var(--green);min-height:24px}
+    .size-chart{width:100%;border-collapse:collapse;margin:10px 0 5px;font-size:12px}
+    .size-chart th,.size-chart td{border-bottom:1px solid #e3ebf2;padding:7px 4px;text-align:center}
+    .size-chart th{color:var(--navy);background:#f0f7fc}
+    .size-chart tr.unavailable{opacity:.55}
+    .fineprint{font-size:12px;color:var(--muted)}
+    details{margin-top:13px}
+    summary{color:#056ba6;cursor:pointer;font-weight:700;font-size:13px}
+    details img{display:block;width:100%;max-width:680px;border-radius:8px;margin-top:10px}
+    .jersey-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:13px}
+    .notice{font-size:13px;padding:10px 12px;border-radius:9px;margin-top:9px;background:#eff7ff;color:#12436b}
+    .notice.error{background:#fff0ee;color:#a3292b}
+    .notice.success{background:#e7f7ef;color:#15643e}
+    .actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px}
+    .primary{background:var(--blue);border:none;border-radius:11px;color:white;font-weight:800;padding:13px 22px;min-height:45px}
+    .primary:hover{background:#09578b}
+    .muted-btn{border:1px solid #b4ccd9;border-radius:9px;background:#fff;color:var(--navy);padding:9px 12px;font-weight:700}
+    .tables{display:grid;grid-template-columns:1fr 1.15fr;gap:18px;margin-top:20px}
+    .table-header{display:flex;align-items:start;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+    .table-header h2{margin:0}
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th{background:#eef6fc;text-align:left;color:#0d3d65;padding:10px 8px;white-space:nowrap}
+    td{padding:9px 8px;border-bottom:1px solid #e7edf3;vertical-align:top}
+    .empty{color:var(--muted);font-style:italic;text-align:center;padding:22px 8px}
+    .footer{font-size:12px;color:var(--muted);text-align:center;margin-top:18px}
+    .offscreen{position:absolute;left:-99999px}
+    @media(max-width:840px){.grid,.tables,.jersey-layout{grid-template-columns:1fr}.jersey-photo{max-width:380px;margin:auto}.container{padding:12px 10px 40px}.hero{padding:22px 18px}.crest{font-size:36px}}
+    @media(max-width:450px){.jersey-fields{grid-template-columns:1fr}.sizes{grid-template-columns:repeat(5,1fr)}.card{padding:15px}.role{padding:9px 5px}.hero h1{font-size:25px}}
+    @media print{body{background:#fff}.hero,.stats,.card,.footer{display:none!important}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="hero">
+      <div><span class="tag">LỚP 2/12 · NGÀY HỘI THỂ THAO</span><h1>ĐĂNG KÝ BÓNG ĐÁ & ÁO ĐẤU</h1><p>Thi đấu hết mình · Cổ vũ nhiệt tình</p></div>
+      <div class="crest" aria-hidden="true">⚽</div>
+    </header>
+
+    <section class="stats" aria-label="Thống kê">
+      <div class="stat"><b id="countAthletes">0</b><span>Bé tham gia thi đấu</span></div>
+      <div class="stat"><b id="countSupporters">0</b><span>Bé cổ vũ và đặt áo</span></div>
+      <div class="stat"><b id="countOrders">0</b><span>Bộ áo đã đăng ký</span></div>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <h2><span class="step">1</span> Chọn tên học sinh</h2>
+        <p class="sub">Nhập từ 2 ký tự, có thể không dấu. Chọn đúng tên bé trong kết quả gợi ý.</p>
+        <div class="searchbox">
+          <label for="studentSearch">Họ tên bé</label>
+          <input type="text" id="studentSearch" autocomplete="off" placeholder="Ví dụ: Lịch Khê hoặc khanh">
+          <div class="suggestions" id="suggestions" role="listbox" aria-label="Danh sách gợi ý"></div>
+          <div class="selected" id="selectedName" aria-live="polite"></div>
+        </div>
+        <hr style="border:0;border-top:1px solid #e2ecf4;margin:22px 0">
+        <h2><span class="step">2</span> Hình thức tham gia</h2>
+        <div class="roles" role="group" aria-label="Hình thức tham gia">
+          <button type="button" class="role" data-role="Thi đấu" aria-pressed="false">⚽ Thi đấu<small>Ghi tên vào danh sách nộp trường</small></button>
+          <button type="button" class="role" data-role="Cổ vũ" aria-pressed="false">📣 Cổ vũ<small>Không nằm trong danh sách thi đấu</small></button>
+        </div>
+        <div class="notice">Mỗi bé có một đăng ký. Cả hai hình thức đều chọn áo để lập danh sách đặt đồng phục.</div>
+      </section>
+
+      <section class="card jersey-card">
+        <h2><span class="step">3</span> Chọn áo đấu</h2>
+        <div class="jersey-layout">
+          <div class="jersey-photo">
+            <img src="<?= jerseyImage ?>" alt="Mẫu áo bóng đá xanh phối quần xanh đậm" onerror="this.style.display='none'">
+            <div class="jersey-caption">Mẫu áo từ ban tổ chức<div class="price" id="price">147.000đ / bộ</div></div>
+          </div>
+          <div>
+            <label>Chọn size áo</label>
+            <div class="sizes" id="sizeButtons" role="group" aria-label="Chọn size"></div>
+            <div id="sizeSelected" class="size-selected" aria-live="polite"></div>
+            <table class="size-chart" aria-label="Bảng size tham khảo">
+              <thead><tr><th>Size</th><th>Cân nặng</th><th>Dài áo</th><th>Vòng ngực</th></tr></thead>
+              <tbody id="sizeRows"></tbody>
+            </table>
+            <div class="fineprint">Cỡ 1, 3, 15 có trong bảng tham khảo nhưng chưa nằm trong các size áo đang bán. Nhà cung cấp không ghi chiều cao trong bảng gốc.</div>
+            <details><summary>Xem ảnh bảng size từ nhà cung cấp</summary>
+              <img src="<?= sizeImage ?>" alt="Ảnh bảng size áo trẻ em từ nhà cung cấp" onerror="this.style.display='none'">
+            </details>
+          </div>
+        </div>
+        <div class="jersey-fields">
+          <div class="field"><label for="jerseyNumber">Số áo đấu (0–99)</label><input type="number" min="0" max="99" step="1" id="jerseyNumber" placeholder="Ví dụ: 10" inputmode="numeric"></div>
+          <div class="field"><label for="printName">Tên in trên áo</label><input type="text" maxlength="40" id="printName" placeholder="Ví dụ: Lịch Khê"></div>
+        </div>
+        <div class="fineprint">Hệ thống gợi ý tên lót + tên và cho phép chỉnh sửa. Số áo của các bé <b>Thi đấu</b> không được trùng.</div>
+      </section>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="primary" id="submitBtn">Xác nhận đăng ký</button>
+      <span class="fineprint" id="submissionHelp">Vui lòng chọn học sinh, vai trò, size và số áo.</span>
+    </div>
+    <div id="message" class="notice offscreen" role="status" aria-live="polite"></div>
+
+    <section class="tables">
+      <div class="card">
+        <div class="table-header"><div><h2><span class="step">4A</span> Danh sách thi đấu</h2><div class="sub">Chỉ những bé đã chọn “Thi đấu”</div></div>
+          <button type="button" class="muted-btn" id="printAthletes">🖨 In danh sách</button></div>
+        <div class="table-wrap"><table><thead><tr><th>STT</th><th>Họ tên học sinh</th><th>Số áo</th></tr></thead><tbody id="athletesBody"><tr><td colspan="3" class="empty">Đang tải...</td></tr></tbody></table></div>
+      </div>
+      <div class="card">
+        <div class="table-header"><div><h2><span class="step">4B</span> Danh sách đặt áo</h2><div class="sub">Bao gồm bé thi đấu và bé cổ vũ</div></div>
+          <button type="button" class="muted-btn" id="printOrders">🖨 In đơn áo</button></div>
+        <div class="table-wrap"><table><thead><tr><th>STT</th><th>Họ tên</th><th>Tên in áo</th><th>Size</th><th>Số áo</th><th>Vai trò</th></tr></thead><tbody id="ordersBody"><tr><td colspan="6" class="empty">Đang tải...</td></tr></tbody></table></div>
+      </div>
+    </section>
+    <div class="actions"><button type="button" class="muted-btn" id="refreshBtn">↻ Cập nhật hai danh sách</button><span class="fineprint">Danh sách sắp xếp theo tên gọi A–Z, sau đó theo họ tên.</span></div>
+    <footer class="footer">Thông tin đăng ký dành cho phụ huynh lớp 2/12. Không chia sẻ đường link ra ngoài nhóm lớp.</footer>
+  </div>
+<script>
+(function(){
+  'use strict';
+  const $=id=>document.getElementById(id);
+  let selected=null,role='',size='',results=[],lists={athletes:[],orders:[]},editToken='',busy=false,searchTimer=0,searchSequence=0;
+  const formatMoney=n=>Number(n).toLocaleString('vi-VN')+'đ';
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const lastTwo=s=>String(s||'').trim().split(/\s+/).slice(1).join(' ')||String(s||'').trim();
+  const tokenKey=id=>'bongda-2-12:'+id;
+  const readToken=id=>{try{return localStorage.getItem(tokenKey(id))||'';}catch(e){return '';}};
+  const saveToken=(id,token)=>{try{localStorage.setItem(tokenKey(id),token);return true;}catch(e){return false;}};
+  function message(text,type){
+    const el=$('message');el.textContent=text;el.className='notice '+(type||'');el.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+  function server(fn,args,onSuccess){
+    let handler=google.script.run.withSuccessHandler(onSuccess).withFailureHandler(e=>{
+      busy=false;$('submitBtn').disabled=false;
+      message(e&&e.message?e.message:'Không thể kết nối. Vui lòng thử lại.','error');
+    });
+    handler[fn].apply(handler,args);
+  }
+  function renderLists(data){
+    lists=data||{athletes:[],orders:[]};
+    $('countAthletes').textContent=lists.athletes.length;
+    $('countOrders').textContent=lists.orders.length;
+    $('countSupporters').textContent=lists.orders.filter(r=>r.role==='Cổ vũ').length;
+    $('athletesBody').innerHTML=lists.athletes.length?lists.athletes.map(r=>
+      '<tr><td>'+r.stt+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.number)+'</td></tr>').join(''):
+      '<tr><td colspan="3" class="empty">Chưa có bé đăng ký thi đấu</td></tr>';
+    $('ordersBody').innerHTML=lists.orders.length?lists.orders.map(r=>
+      '<tr><td>'+r.stt+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.printName)+'</td><td>'+esc(r.size)+'</td><td>'+esc(r.number)+'</td><td>'+esc(r.role)+'</td></tr>').join(''):
+      '<tr><td colspan="6" class="empty">Chưa có đơn đặt áo</td></tr>';
+  }
+  function renderChart(chart){
+    $('sizeButtons').innerHTML=chart.filter(x=>x.available).map(x=>
+      '<button type="button" class="size-btn" data-size="'+esc(x.size)+'">'+esc(x.size)+'</button>').join('');
+    $('sizeRows').innerHTML=chart.map(x=>
+      '<tr class="'+(x.available?'':'unavailable')+'"><td>'+esc(x.size)+(x.available?'':' *')+'</td><td>'+esc(x.weight)+'</td><td>'+esc(x.length)+'</td><td>'+esc(x.chest)+'</td></tr>').join('');
+    $('sizeButtons').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>setSize(b.dataset.size)));
+  }
+  function setRole(value){
+    role=value;
+    document.querySelectorAll('.role').forEach(b=>{const active=b.dataset.role===value;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
+  }
+  function setSize(value){
+    size=value;
+    document.querySelectorAll('.size-btn').forEach(b=>b.classList.toggle('active',b.dataset.size===value));
+    const row=[...$('sizeRows').querySelectorAll('tr')].find(x=>x.firstElementChild.textContent.trim()===value);
+    $('sizeSelected').textContent=value?'Đã chọn size '+value+(row?' · '+row.children[1].textContent+' · dài '+row.children[2].textContent:''):'';
+  }
+  function clearChosen(){
+    selected=null;editToken='';$('selectedName').textContent='';
+    $('printName').value='';$('jerseyNumber').value='';setRole('');setSize('');
+    $('submitBtn').disabled=false;$('submissionHelp').textContent='Vui lòng chọn học sinh, vai trò, size và số áo.';
+  }
+  function chooseStudent(s){
+    selected=s;results=[];searchSequence++;clearTimeout(searchTimer);$('suggestions').innerHTML='';$('studentSearch').value=s.name;
+    $('selectedName').textContent='✓ Đã chọn: '+s.name;
+    $('printName').value=lastTwo(s.name);
+    editToken=readToken(s.id);
+    server('getMyRegistration',[s.id,editToken],response=>{
+      if(!selected||selected.id!==s.id) return;
+      if(response.exists&&!response.editable){
+        $('submitBtn').disabled=true;
+        $('submissionHelp').textContent='Đã có đăng ký từ thiết bị khác. Liên hệ ban tổ chức để điều chỉnh.';
+        message('Học sinh này đã đăng ký. Để bảo vệ dữ liệu, thiết bị không có mã sửa không thể ghi đè.','error');
+      } else if(response.editable){
+        const r=response.registration;setRole(r.role);setSize(r.size);
+        $('jerseyNumber').value=r.number;$('printName').value=r.printName;
+        $('submissionHelp').textContent='Có thể cập nhật đăng ký đã lưu trên thiết bị này.';
+      }
+    });
+  }
+  function showSuggestions(arr){
+    results=arr;
+    $('suggestions').innerHTML=arr.map((s,i)=>'<button type="button" data-index="'+i+'">'+esc(s.name)+'</button>').join('');
+    $('suggestions').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>chooseStudent(results[Number(b.dataset.index)])));
+  }
+  $('studentSearch').addEventListener('input',function(){
+    clearChosen();const q=this.value.trim();clearTimeout(searchTimer);const mySeq=++searchSequence;
+    $('suggestions').innerHTML='';
+    if(q.length<2) return;
+    searchTimer=setTimeout(()=>server('searchStudents',[q],arr=>{
+      if(mySeq!==searchSequence)return;showSuggestions(arr);
+      if(!arr.length)$('selectedName').textContent='Không tìm thấy bé. Kiểm tra lại tên trong danh sách lớp.';
+    }),250);
+  });
+  $('studentSearch').addEventListener('keydown',e=>{
+    if(e.key==='Enter'){
+      e.preventDefault();clearTimeout(searchTimer);
+      if(results.length===1)return chooseStudent(results[0]);
+      if(results.length>1)return message('Có nhiều tên phù hợp. Vui lòng chọn đúng bé trong gợi ý.','error');
+      const q=$('studentSearch').value.trim();if(q.length<2)return;
+      const seq=++searchSequence;
+      server('searchStudents',[q],arr=>{if(seq!==searchSequence)return;if(arr.length===1)chooseStudent(arr[0]);else{showSuggestions(arr);message(arr.length?'Có nhiều tên phù hợp. Vui lòng chọn đúng bé trong gợi ý.':'Không tìm thấy tên bé.','error');}});
+    }
+  });
+  document.querySelectorAll('.role').forEach(b=>b.addEventListener('click',()=>setRole(b.dataset.role)));
+  $('submitBtn').addEventListener('click',()=>{
+    if(busy)return;
+    if(!selected)return message('Vui lòng chọn tên bé từ danh sách gợi ý.','error');
+    if(!role)return message('Vui lòng chọn Thi đấu hoặc Cổ vũ.','error');
+    if(!size)return message('Vui lòng chọn size áo.','error');
+    const number=$('jerseyNumber').value.trim();
+    if(!/^(?:[0-9]|[1-9][0-9])$/.test(number))return message('Nhập số áo từ 0 đến 99.','error');
+    const printName=$('printName').value.trim();
+    if(printName.length<2)return message('Vui lòng nhập tên in trên áo.','error');
+    busy=true;$('submitBtn').disabled=true;
+    server('submitRegistration',[{studentId:selected.id,role,size,number,printName,editToken}],response=>{
+      busy=false;$('submitBtn').disabled=false;editToken=response.editToken;
+      const tokenSaved=saveToken(selected.id,editToken);
+      renderLists(response.lists);
+      $('submissionHelp').textContent='Đã lưu. Có thể sửa từ thiết bị này.';
+      message('Đăng ký thành công cho '+response.studentName+'! Hai danh sách đã được cập nhật.'+(tokenSaved?'':' Lưu ý: trình duyệt không cho lưu mã sửa; cần liên hệ ban tổ chức nếu muốn cập nhật sau này.'),'success');
+    });
+  });
+  $('refreshBtn').addEventListener('click',()=>server('getPublicLists',[],renderLists));
+  function printTable(type){
+    const athlete=type==='athletes';
+    const headers=athlete?['STT','Họ và tên','Số áo']:['STT','Họ và tên','Tên in áo','Size','Số áo','Hình thức'];
+    const keys=athlete?['stt','name','number']:['stt','name','printName','size','number','role'];
+    const records=lists[type];const title=athlete?'DANH SÁCH THAM GIA THI ĐẤU':'DANH SÁCH ĐẶT ÁO ĐẤU';
+    const w=window.open('','_blank');if(!w)return message('Trình duyệt đang chặn cửa sổ in. Hãy cho phép pop-up rồi thử lại.','error');
+    w.document.open();
+    w.document.write('<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>'+esc(title)+'</title>'+
+      '<style>@page{size:A4;margin:16mm}body{font-family:Arial,sans-serif;color:#111}h1{font-size:18px;text-align:center}p{text-align:center;font-size:13px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border:1px solid #222;padding:8px;text-align:left}th{background:#eee}td:first-child{text-align:center;width:35px}.footer{margin-top:25px;text-align:right}</style></head><body>'+
+      '<h1>'+esc(title)+'</h1><p>Lớp 2/12 · Số lượng: '+records.length+'</p><table><thead><tr>'+headers.map(x=>'<th>'+esc(x)+'</th>').join('')+'</tr></thead><tbody>'+
+      records.map(r=>'<tr>'+keys.map(k=>'<td>'+esc(r[k])+'</td>').join('')+'</tr>').join('')+
+      '</tbody></table><div class="footer">Ngày in: '+new Date().toLocaleDateString('vi-VN')+'</div></body></html>');
+    w.document.close();w.focus();setTimeout(()=>w.print(),400);
+  }
+  $('printAthletes').addEventListener('click',()=>printTable('athletes'));
+  $('printOrders').addEventListener('click',()=>printTable('orders'));
+  server('getInitialData',[],data=>{
+    $('price').textContent=formatMoney(data.price)+' / bộ';
+    renderChart(data.chart);renderLists(data.lists);
+  });
+})();
+</script>
+</body>
+</html>
