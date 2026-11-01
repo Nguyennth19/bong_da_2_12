@@ -22,6 +22,15 @@
 - [ ] Không còn nút “Cập nhật hai danh sách”; sau khi lưu, danh sách và thống kê cập nhật ngay.
 - [ ] Bảng thi đấu và bảng đặt áo vẫn xếp theo tên gọi A–Z và đánh lại STT.
 
+## V4 — checklist chibi và cân đối khung
+- [ ] Header có hình `boy-chibi.png` thực tế, không còn quả bóng mặc định nếu ảnh tải được.
+- [ ] Với file chibi gốc 3,57 MB, hàm `imageDataUri_` trả về PNG base64 thay vì từ chối vì giới hạn 2 MB.
+- [ ] Trong bảng size chỉ có 5, 7, 11, 13 (không còn dòng 8 thiếu số đo); ô chọn size 8 vẫn có vì trước đó đã chốt.
+- [ ] Giá áo 147.000đ/bộ có màu đỏ đậm `#a8092c`.
+- [ ] Desktop: ảnh áo và bảng thông số cùng chiều cao container, khung thông số hẹp lại; mobile: hai khung xếp dọc.
+- [ ] Kiểm thử trực quan 390px, 768px, 1440px trên `/dev` và phiên bản `/exec` mới.
+- [ ] `/exec` xuất hiện chibi sau khi deploy New version.
+
 ## V3 — checklist nghiệm thu bắt buộc
 - [ ] GitHub `main` có đủ sửa đổi, không chỉ đổi size và chiều cao module.
 - [ ] Không có huy hiệu số thứ tự ở bất kỳ tiêu đề module nào.
