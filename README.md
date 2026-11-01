@@ -66,6 +66,17 @@ Giao diện dùng **Be Vietnam Pro** qua Google Fonts (fallback Arial khi offlin
 - Để tab báo cáo trên Sheets tự cập nhật sau khi tick `PAID` ở tab `DANG_KY` hoặc `AO_BO_SUNG`, hãy chạy một lần `installPaymentEditTrigger()` trong Apps Script, cấp quyền khi được yêu cầu. Nếu chưa cài trigger, có thể chạy thủ công `refreshSummaries()`; Web App vẫn tự đọc tình trạng thu mới khi đồng bộ.
 - Sau khi đồng bộ, **không chạy lại lệnh nhập dữ liệu**: dữ liệu đã ghi trực tiếp vào Google Sheets. Chỉ `clasp push` và deploy phiên bản Web App mới.
 
+## V8 — Cập nhật bình chọn mới và đội tuyển từ danh sách viết tay
+- **Nguồn dữ liệu đã nhập trực tiếp Google Sheets**: 13 tên có trong ảnh danh sách đội tuyển, đối chiếu 100% với `DANH SACH HOC SINH`; lưu trong tab **`DOI_THI_DAU`** (STUDENT_ID / HỌ VÀ TÊN / NGUỒN ĐĂNG KÝ).
+- `DS_THI_DAU` và Web App dùng hợp nhất **đội tuyển viết tay** với các bé đã chọn **Thi đấu** trước đây, khử trùng theo `STUDENT_ID`. Hiện **14 bé** (13 từ giấy + 1 bé đã đăng ký thi đấu trước đó nhưng không xuất hiện trong giấy). Bé chưa đặt áo vẫn có tên và số áo trống. Khi bé đăng ký áo sau này, số áo tự điền từ `DANG_KY` qua cùng STUDENT_ID.
+- **Nguyễn Đức Phú** được nhập đơn áo từ bình chọn: số **17**, cân nặng **20 kg** => **size 5** theo bảng nhà cung cấp, được thêm vào `DANG_KY` với giá áo 150.000đ; `DS_DAT_AO` hiện **12 bộ**.
+- **Lâm Gia Minh** vẫn có áo chính số **21**, size 7 và một áo em bé chưa có số (cả hai bộ đã có trong bảng đặt áo). Tên Gia Minh trên giấy đội tuyển được ghi thêm vào `DOI_THI_DAU`, **không xóa hay tự đổi vai trò "Cổ vũ"** trong đăng ký áo trước đó. Đội tuyển và mua áo là hai danh mục độc lập.
+- **Cô Ngọc** vẫn có đơn áo người lớn size **S**, số **12**; bỏ thông tin ngoại lệ và các ghi chú nội bộ khỏi danh sách áo hiển thị công khai. Nội bộ tab `AO_BO_SUNG` ghi chú trung tính "Áo người lớn".
+- **Lịch Khê** được giữ **size 7, số 19** theo yêu cầu chỉnh sửa rõ ràng đã chốt trước đó. Ảnh bình chọn mới có dòng size 5 nhưng không dùng để ghi đè yêu cầu này.
+- Nếu người đăng ký khai theo kg, hàm `sizeFromWeight_(kg)` chỉ suy mốc cân nặng có số liệu gốc: **20→5**, **25→7**, **30→9**, **35→11**, **40–45→13**; ngoài mốc này để trống, yêu cầu chọn size thủ công, tránh đoán cỡ.
+- Sheet `DOI_THI_DAU` được dùng lâu dài làm nguồn cầu thủ đăng ký trực tiếp. Không thêm các em chưa mua áo vào `DANG_KY` vì như vậy sẽ tạo đơn ảo.
+- Cập nhật code trên `main`, chạy `clasp push`, rồi triển khai phiên bản Web App mới; **không chạy lại setup/import dữ liệu**. Không đổi các checkbox đã thu tiền.
+
 ## Nguồn dữ liệu
 - [Google Sheet DA_BONG_2_12](https://docs.google.com/spreadsheets/d/1hZc7Xvpy2jfBRZZF0o07msk6zc6TgZBst4PDrC4fdtk/edit), tab `DANH SACH HOC SINH` có 43 em vào thời điểm khảo sát.
 - [Ảnh áo đấu](https://drive.google.com/file/d/1ZRsAJOUB4ASQ6DFMd-pW0lNhWVC5UD93/view)

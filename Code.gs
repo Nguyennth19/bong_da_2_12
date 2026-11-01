@@ -8,6 +8,7 @@ const CFG = Object.freeze({
   studentSheet: 'DANH SACH HOC SINH',
   registrationSheet: 'DANG_KY',
   athleteSheet: 'DS_THI_DAU',
+  teamRosterSheet: 'DOI_THI_DAU',
   jerseySheet: 'DS_DAT_AO',
   extraJerseySheet: 'AO_BO_SUNG',
   jerseyImageId: '1ZRsAJOUB4ASQ6DFMd-pW0lNhWVC5UD93',
@@ -28,6 +29,7 @@ const EXTRA_HEADERS = [
   'ORDER_ID','STUDENT_ID','HO_TEN','TEN_IN_AO','SIZE','SO_AO',
   'VAI_TRO','PAID','GHI_CHU','SO_LUONG','DON_GIA_VND'
 ];
+const TEAM_HEADERS = ['STUDENT_ID','HỌ VÀ TÊN','NGUỒN ĐĂNG KÝ'];
 const ORDER_HEADERS = ['STT','HỌ VÀ TÊN','TÊN IN ÁO','SIZE','SỐ ÁO','HÌNH THỨC','ĐÃ ĐÓNG TIỀN'];
 const SIZE_CHART = [
   {size:'5', weight:'20 kg', length:'52 cm', chest:'74 cm'},
@@ -220,18 +222,61 @@ function upgradePaymentTracking() {
  * Mỗi học sinh có một đăng ký chính, nhưng có thể có thêm áo bổ sung.
  * Các áo ngoại lệ (người lớn) được ghi AO_BO_SUNG, không tự thêm vào roster.
  */
+/**
+ * Danh sách cầu thủ đăng ký trực tiếp từ giấy, tách khỏi đăng ký mua áo.
+ * STUDENT_ID làm khóa để không đếm trùng; họ tên lấy theo roster gốc khi có.
+ */
+function readTeamRoster_(sh) {
+  if(!sh || sh.getLastRow()<2)return [];
+  const seen=new Set();
+  return sh.getRange(2,1,sh.getLastRow()-1,TEAM_HEADERS.length)
+    .getDisplayValues().map(r=>({id:String(r[0]||'').trim(),name:String(r[1]||'').trim()}))
+    .filter(r=>{
+      if(!r.id||!r.name||seen.has(r.id))return false;
+      seen.add(r.id);return true;
+    });
+}
+
+/**
+ * Chỉ suy size theo cân nặng khi bảng nhà cung cấp có mốc tương ứng,
+ * không tự phỏng đoán giá trị kg nằm giữa hai mốc.
+ */
+function sizeFromWeight_(kg) {
+  const n=Number(String(kg).replace(/\s*kg\s*/i,'').replace(',','.'));
+  if(!Number.isFinite(n))return '';
+  if(n===20)return '5';
+  if(n===25)return '7';
+  if(n===30)return '9';
+  if(n===35)return '11';
+  if(n>=40&&n<=45)return '13';
+  return '';
+}
+
 function collectLists_(ss) {
   const main=readRegistrations_(ss.getSheetByName(CFG.registrationSheet)).sort(compareStudentNames_);
-  const athletes=main.filter(r=>r.role==='Thi đấu' && r.number!=='')
-    .map((r,i)=>({stt:i+1,name:r.name,number:r.number}));
+  const mainById=new Map(main.map(r=>[r.id,r]));
+  const team=readTeamRoster_(ss.getSheetByName(CFG.teamRosterSheet));
+  const athleteById=new Map();
+
+  // Đội tuyển từ giấy: chỉ thêm tên; khi có đơn áo thì tự hiện số áo.
+  team.forEach(r=>{
+    const registered=mainById.get(r.id);
+    athleteById.set(r.id,{name:r.name,number:registered?registered.number:''});
+  });
+  // Không xóa các cầu thủ đã chọn Thi đấu trên Web App trước đây.
+  main.filter(r=>r.role==='Thi đấu').forEach(r=>{
+    if(!athleteById.has(r.id))athleteById.set(r.id,{name:r.name,number:r.number});
+  });
+  const athletes=[...athleteById.values()].sort(compareStudentNames_)
+    .map((r,i)=>({...r,stt:i+1}));
   const mainOrders=main.filter(r=>CFG.allowedRoles.includes(r.role) && r.size)
     .map(r=>({name:r.name,printName:r.printName,size:r.size,number:r.number,
-      role:r.role,paid:r.paid,notes:'',orderId:'MAIN-'+r.id,studentId:r.id}));
+      role:r.role,paid:r.paid,orderId:'MAIN-'+r.id,studentId:r.id}));
   const extraOrders=readExtraOrders_(ss.getSheetByName(CFG.extraJerseySheet))
     .filter(r=>r.quantity>0)
     .flatMap(r=>Array.from({length:r.quantity},(_,i)=>({
       name:r.name,printName:r.printName,size:r.size,number:r.number,
-      role:r.role,paid:r.paid,notes:r.notes,
+      role:r.role,paid:r.paid,
       orderId:r.orderId+(r.quantity>1?'-'+(i+1):''),studentId:r.studentId
     })));
   const allOrders=mainOrders.concat(extraOrders).sort(compareStudentNames_);
@@ -289,6 +334,7 @@ function setupProject() {
   ensureSheet_(ss,CFG.athleteSheet,['STT','HỌ VÀ TÊN','SỐ ÁO']);
   ensureSheet_(ss,CFG.jerseySheet,ORDER_HEADERS);
   ensureSheet_(ss,CFG.extraJerseySheet,EXTRA_HEADERS);
+  ensureSheet_(ss,CFG.teamRosterSheet,TEAM_HEADERS);
   rebuildSummaries_(ss);
   SpreadsheetApp.flush();
   return 'OK — '+n+' học sinh; đã chuẩn bị các bảng đăng ký.';

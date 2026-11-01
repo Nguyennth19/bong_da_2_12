@@ -332,7 +332,6 @@
     .tables .order-card table{font-size:clamp(11px,1vw,13px);table-layout:auto}
     .tables .order-card th,.tables .order-card td{padding:10px 6px}
     .tables .order-card th:last-child,.tables .order-card td:last-child{text-align:center}
-    .order-note{display:block;font-size:10px;color:#7b6c86;margin-top:4px;max-width:200px;line-height:1.4}
     .paid-cell{white-space:nowrap;text-align:center}
     .paid-check{display:inline-flex;width:23px;height:23px;border:1.8px solid #bac8d3;
       border-radius:6px;align-items:center;justify-content:center;background:#fff;
@@ -565,7 +564,7 @@
       '<tr><td>'+r.stt+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.number)+'</td></tr>').join(''):
       '<tr><td colspan="3" class="empty">Chưa có bé đăng ký thi đấu</td></tr>';
     $('ordersBody').innerHTML=lists.orders.length?lists.orders.map(r=>
-      '<tr><td>'+r.stt+'</td><td>'+esc(r.name)+(r.notes?'<small class="order-note">'+esc(r.notes)+'</small>':'')+'</td>'+
+      '<tr><td>'+r.stt+'</td><td>'+esc(r.name)+'</td>'+
       '<td>'+esc(r.printName)+'</td><td>'+esc(r.size)+'</td><td>'+esc(r.number)+'</td>'+
       '<td>'+esc(r.role)+'</td><td class="paid-cell"><span class="paid-check '+(r.paid?'is-paid':'')+'" '+
       'aria-label="'+(r.paid?'Đã thu tiền':'Chưa xác nhận thu tiền')+'">'+(r.paid?'✓':'')+'</span></td></tr>').join(''):
