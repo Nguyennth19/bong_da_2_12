@@ -114,6 +114,8 @@ function submitRegistration(input) {
       throw new Error('Số áo này đã có bạn thi đấu chọn. Vui lòng chọn số khác.');
     }
     const token=existing ? String(input.editToken) : Utilities.getUuid().replace(/-/g,'')+Utilities.getUuid().replace(/-/g,'');
+    const extraCost=readExtraOrders_(ss.getSheetByName(CFG.extraJerseySheet))
+      .filter(x=>x.studentId===id).reduce((total,x)=>total+x.quantity*x.price,0);
     const now=new Date();
     // Giữ trạng thái thanh toán khi chỉnh sửa đăng ký; không cho người dùng đổi PAID.
     const values=[
@@ -127,7 +129,7 @@ function submitRegistration(input) {
       existing ? existing.paidMethod : '',
       existing ? existing.paidNote : '',
       existing ? existing.importNote : '',
-      role==='Cổ vũ'?150000:400000
+      (role==='Cổ vũ'?150000:400000)+extraCost
     ];
     if(existing) {
       sh.getRange(existing.sheetRow,1,1,REG_HEADERS.length).setValues([values]);
