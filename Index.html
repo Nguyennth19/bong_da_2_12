@@ -779,8 +779,11 @@
   });
   function printTable(type){
     const athlete=type==='athletes';
-    const headers=athlete?['STT','Họ và tên','Số áo']:['STT','Họ và tên','Tên in áo','Size','Số áo','Hình thức','Đã đóng'];
-    const keys=athlete?['stt','name','number']:['stt','name','printName','size','number','role','paid'];
+    const displayPaid=!currentUiConfig || currentUiConfig.paid_column!==false;
+    const headers=athlete?['STT','Họ và tên','Số áo']:
+      ['STT','Họ và tên','Tên in áo','Size','Số áo','Hình thức'].concat(displayPaid?['Đã đóng']:[]);
+    const keys=athlete?['stt','name','number']:
+      ['stt','name','printName','size','number','role'].concat(displayPaid?['paid']:[]);
     const records=lists[type];const title=athlete?'DANH SÁCH THAM GIA THI ĐẤU':'DANH SÁCH ĐẶT ÁO ĐẤU';
     const w=window.open('','_blank');if(!w)return message('Trình duyệt đang chặn cửa sổ in. Hãy cho phép pop-up rồi thử lại.','error');
     w.document.open();
