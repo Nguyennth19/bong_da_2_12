@@ -1,3 +1,20 @@
+
+## V11 — QA cấu hình ẩn/hiện module qua Google Sheets
+
+- [ ] Tab `CAU_HINH_GIAO_DIEN` có 22 key duy nhất, header A:C, checkbox BOOLEAN C2:C23 và tất cả mặc định TRUE.
+- [ ] Hai ô khóa nghiệp vụ `registration_open`, `payment_open` nằm cuối bảng để dễ phân biệt với điều khiển ẩn thuần UI.
+- [ ] Tắt `hero` → ẩn header; bật lại → xuất hiện, không mất ảnh.
+- [ ] Tắt `fund` → ẩn quỹ và ngân hàng; bật lại → hiện đúng bố cục.
+- [ ] Chỉ tắt `bank_qr` → ảnh QR ẩn, thông tin ngân hàng vẫn còn.
+- [ ] Tắt `paid_column` → cột thanh toán ẩn cả trên bảng áo lẫn lúc in.
+- [ ] Tắt `registration_open` → nút đăng ký ẩn và gọi `submitRegistration` qua API vẫn từ chối lưu.
+- [ ] Tắt `payment_open` → nút thanh toán ẩn và `submitPaymentReport` từ chối cập nhật cột K.
+- [ ] Tắt `student_search` → nút đăng ký / báo tiền tự ẩn vì ô tên bắt buộc không còn.
+- [ ] Trong browser khác, thay đổi checkbox trên Sheets được phản ánh trong ~30 giây khi Web App đang mở; quay lại tab kích hoạt kiểm tra.
+- [ ] Bật tất cả checkbox: hiển thị lại đủ thành phần và chức năng như V10, không thay đổi dữ liệu.
+- [ ] Không cấp quyền Editor Google Sheet cho người dùng Web App.
+- [ ] Kiểm thử `/dev` sau `clasp push`, rồi New version `/exec` trước khi gửi phụ huynh.
+
 # QA — DA BONG 2/12
 
 ## One-time setup (on a test/copy spreadsheet first, if testing)
