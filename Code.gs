@@ -418,7 +418,7 @@ function getPublicLists() {
   const lists=collectLists_(ss);
   const uiConfig=readUiConfig_(ss);
   // Không công bố số liệu thực thu khi người quản trị tắt phần tổng tiền.
-  if(!uiConfig.fund_totals && lists.stats) {
+  if((!uiConfig.fund_totals || !uiConfig.fund) && lists.stats) {
     lists.stats={...lists.stats,plannedTotal:null,collectedTotal:null};
   }
   return {...lists,uiConfig,updatedAt:new Date().toISOString()};
