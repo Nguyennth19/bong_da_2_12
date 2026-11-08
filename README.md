@@ -96,6 +96,28 @@ Giao diện dùng **Be Vietnam Pro** qua Google Fonts (fallback Arial khi offlin
 - Đã cập nhật cột `EXPECTED_PAYMENT` trên 10 hồ sơ hiện có trong `DANG_KY`; không đổi `PAID`, `PAYMENT_REPORTED` hay `PAID_AMOUNT`.
 - **Quan trọng về đối soát:** nếu `PAID=TRUE` nhưng `PAID_AMOUNT` trống, backend hiện suy giá trị theo phí chuẩn mới; để báo cáo *thực thu* chính xác, ban tổ chức cần điền `PAID_AMOUNT` theo giao dịch ngân hàng. Không coi mức dự kiến mới là bằng chứng đã nhận thêm tiền.
 
+
+## V11 — Bật/tắt giao diện trực tiếp từ Google Sheets
+
+**Tab quản trị:** [CAU_HINH_GIAO_DIEN](https://docs.google.com/spreadsheets/d/1hZc7Xvpy2jfBRZZF0o07msk6zc6TgZBst4PDrC4fdtk/edit#gid=1287020404)
+
+- **Cột A** `KEY (KHÔNG SỬA)`: mã tính năng. Không sửa/xóa key.
+- **Cột B** `THÀNH PHẦN GIAO DIỆN`: mô tả để phụ huynh/ban tổ chức hiểu.
+- **Cột C** `HIỂN THỊ / CHO PHÉP`: checkbox TRUE (bật) / FALSE (ẩn hoặc khóa).
+- **22 điều khiển**, mặc định **TRUE**, bảo toàn toàn bộ bố cục và dữ liệu V10 ngay sau cập nhật.
+- Chỉ người có **quyền Editor của Google Sheets** mới có thể chỉnh cột C. Không chia sẻ quyền Editor cho phụ huynh.
+- Web App đọc lại cấu hình cùng danh sách sau mỗi **30 giây khi tab đang mở** hoặc khi quay lại tab. Không cần pull / push / deploy khi chỉ đổi checkbox.
+- `registration_open`: khi FALSE, **backend cấm lưu/chỉnh sửa đăng ký**, đồng thời ẩn nút tương ứng. `payment_open`: tương tự với nút báo đã chuyển khoản. Đây là hai khóa nghiệp vụ, không chỉ CSS.
+- `registration_button` và `payment_button` chỉ điều khiển **hiển thị nút**, không tự khóa API. Muốn thực sự đóng chức năng, chuyển `registration_open` hoặc `payment_open` thành FALSE.
+- Nút được tự ẩn nếu các ô nhập bắt buộc của nó bị ẩn, tránh để nút hiển thị nhưng không thể thao tác.
+- `fund_totals` FALSE hoặc `fund` FALSE: tổng quỹ được bỏ khỏi dữ liệu dashboard trả về để không lộ số tiền trên giao diện đang ẩn.
+- `paid_column` FALSE: ẩn cột trong bảng trên Web App **và bản in đơn áo**.
+- Chỉ là **ẩn hiển thị, không xóa code, dữ liệu hoặc lịch sử**; tick TRUE để hiện lại. Không nên dùng chức năng ẩn UI như một cơ chế bảo mật tuyệt đối cho thông tin ngân hàng hoặc ảnh đã có trong HTML.
+- Hàm admin `setupUiConfig()` chỉ cần chạy khi cấu hình bị thiếu/cần phục hồi. Hàm không ghi đè checkbox hiện có và không đụng tới các tab đăng ký.
+- **Triển khai duy nhất lần đầu:** `git pull origin main`, `clasp push`, Deploy → Manage deployments → Edit → New version → Deploy. Sau đó bật/tắt bằng Sheets.
+
+Ví dụ kết thúc đợt đăng ký: bỏ tick `registration_open`, giữ `athletes_list` và `orders_list`. Khi cần mở lại đăng ký, tích `registration_open` và `registration_button` (nếu đã ẩn) để phục hồi chức năng.
+
 ## Nguồn dữ liệu
 - [Google Sheet DA_BONG_2_12](https://docs.google.com/spreadsheets/d/1hZc7Xvpy2jfBRZZF0o07msk6zc6TgZBst4PDrC4fdtk/edit), tab `DANH SACH HOC SINH` có 43 em vào thời điểm khảo sát.
 - [Ảnh áo đấu](https://drive.google.com/file/d/1ZRsAJOUB4ASQ6DFMd-pW0lNhWVC5UD93/view)
