@@ -9,6 +9,7 @@ const CFG = Object.freeze({
   registrationSheet: 'DANG_KY',
   athleteSheet: 'DS_THI_DAU',
   teamRosterSheet: 'DOI_THI_DAU',
+  uiSheet: 'CAU_HINH_GIAO_DIEN',
   jerseySheet: 'DS_DAT_AO',
   extraJerseySheet: 'AO_BO_SUNG',
   jerseyImageId: '1ZRsAJOUB4ASQ6DFMd-pW0lNhWVC5UD93',
@@ -41,6 +42,98 @@ const SIZE_CHART = [
   {size:'13',weight:'40–45 kg',length:'60 cm',chest:'90 cm'}
 ];
 
+
+/**
+ * Các key ổn định: tên hiển thị có thể chỉnh nhưng không đổi key cột A.
+ * TRUE mặc định đảm bảo nâng cấp không làm mất module cũ.
+ */
+const UI_FEATURES = Object.freeze([
+  {key:'hero',label:'Tiêu đề & hình chibi'},
+  {key:'stats',label:'Bốn ô thống kê'},
+  {key:'participation',label:'Hình thức tham gia'},
+  {key:'registration',label:'Thông tin học sinh & áo đấu'},
+  {key:'student_search',label:'Ô tìm tên học sinh'},
+  {key:'jersey_image',label:'Hình mẫu áo và giá'},
+  {key:'size_chart',label:'Bảng size tham khảo'},
+  {key:'size_picker',label:'Nút chọn size áo'},
+  {key:'jersey_number',label:'Trường số áo'},
+  {key:'print_name',label:'Trường tên in áo'},
+  {key:'fund',label:'Module quỹ và chuyển khoản'},
+  {key:'fund_details',label:'Các khoản dự toán và ghi chú'},
+  {key:'fund_totals',label:'Hai tổng tiền dự kiến / thực thu'},
+  {key:'bank',label:'Thông tin tài khoản chuyển khoản'},
+  {key:'bank_qr',label:'Mã QR chuyển khoản'},
+  {key:'registration_button',label:'Nút xác nhận đăng ký'},
+  {key:'payment_button',label:'Nút báo đã đóng tiền'},
+  {key:'athletes_list',label:'Danh sách thi đấu & nút in'},
+  {key:'orders_list',label:'Danh sách đặt áo & nút in'},
+  {key:'paid_column',label:'Cột đã đóng tiền'},
+  {key:'registration_open',label:'CHO PHÉP nhận đăng ký mới / chỉnh sửa'},
+  {key:'payment_open',label:'CHO PHÉP phụ huynh báo chuyển khoản'}
+]);
+
+function defaultUiConfig_() {
+  return UI_FEATURES.reduce((obj,item)=>(obj[item.key]=true,obj),{});
+}
+
+/**
+ * Đọc tối đa 500 dòng, dùng key (không phụ thuộc thứ tự và nhãn).
+ * Giá trị hợp lệ là checkbox boolean; dữ liệu lỗi giữ mặc định an toàn
+ * với cờ mở ghi dữ liệu: trả FALSE khi hàng tồn tại nhưng C không hợp lệ.
+ */
+function readUiConfig_(ss) {
+  const result=defaultUiConfig_();
+  const sh=ss.getSheetByName(CFG.uiSheet);
+  if(!sh || sh.getLastRow()<2)return result;
+  const rows=sh.getRange(2,1,Math.min(499,sh.getLastRow()-1),3).getValues();
+  rows.forEach(row=>{
+    const key=String(row[0]||'').trim();
+    if(!Object.prototype.hasOwnProperty.call(result,key))return;
+    if(typeof row[2]==='boolean')result[key]=row[2];
+    else if(key==='registration_open' || key==='payment_open')result[key]=false;
+  });
+  return result;
+}
+
+function getUiConfig() {
+  return readUiConfig_(SpreadsheetApp.openById(CFG.spreadsheetId));
+}
+
+/**
+ * Quản trị viên chạy nếu muốn tự tái tạo sheet điều khiển;
+ * chạy lại không ghi đè checkbox đã chỉnh.
+ * Quyền Editor của Sheet mới được thay đổi cấu hình.
+ */
+function setupUiConfig() {
+  const ss=SpreadsheetApp.openById(CFG.spreadsheetId);
+  let sh=ss.getSheetByName(CFG.uiSheet);
+  if(!sh)sh=ss.insertSheet(CFG.uiSheet);
+  const header=['KEY (KHÔNG SỬA)','THÀNH PHẦN GIAO DIỆN','HIỂN THỊ / CHO PHÉP'];
+  const oldHeader=sh.getRange(1,1,1,3).getDisplayValues()[0];
+  if(oldHeader[0] && oldHeader[0]!==header[0])
+    throw new Error('Tab cấu hình đã có nội dung khác; không tự ghi đè.');
+  sh.getRange(1,1,1,3).setValues([header]);
+  const oldRows=sh.getLastRow()>1?
+    sh.getRange(2,1,sh.getLastRow()-1,3).getValues():[];
+  const existing=new Map(oldRows.filter(r=>r[0]).map(r=>[String(r[0]).trim(),r]));
+  const output=UI_FEATURES.map(item=>{
+    const row=existing.get(item.key);
+    return [item.key,item.label,row && typeof row[2]==='boolean'?row[2]:true];
+  });
+  // Chỉ thay vùng danh sách key cấu hình của chính tab này.
+  sh.getRange(2,1,output.length,3).setValues(output);
+  const checkbox=SpreadsheetApp.newDataValidation().requireCheckbox().setAllowInvalid(false).build();
+  sh.getRange(2,3,output.length,1).setDataValidation(checkbox);
+  sh.getRange(1,1,1,3).setBackground('#123b6a').setFontColor('#fff').setFontWeight('bold');
+  sh.getRange(2,1,output.length,1).setBackground('#edf4ff').setFontColor('#365779');
+  sh.getRange(2,3,output.length,1).setHorizontalAlignment('center');
+  sh.setColumnWidths(1,1,210);
+  sh.setColumnWidth(2,390);
+  sh.setColumnWidth(3,180);
+  sh.setFrozenRows(1);
+  return 'Đã chuẩn bị '+output.length+' điều khiển. Các cờ hiện có giữ nguyên.';
+}
+
 function doGet() {
   const tpl=HtmlService.createTemplateFromFile('Index');
   tpl.jerseyImage = imageDataUri_(CFG.jerseyImageId);
@@ -61,6 +154,7 @@ function getInitialData() {
   return {
     chart: SIZE_CHART.map(row => ({...row,available:CFG.availableSizes.includes(row.size)})),
     price: CFG.shirtPrice,
+    uiConfig: getUiConfig(),
     lists: getPublicLists()
   };
 }
@@ -88,6 +182,8 @@ function getMyRegistration(studentId,token) {
 
 function submitRegistration(input) {
   assertSetup_();
+  if(!getUiConfig().registration_open)
+    throw new Error('Ban tổ chức đã tạm đóng đăng ký. Vui lòng liên hệ quản trị viên.');
   const lock=LockService.getScriptLock();
   if(!lock.tryLock(20000)) throw new Error('Hệ thống đang bận. Vui lòng thử lại.');
   try {
@@ -157,6 +253,8 @@ function submitRegistration(input) {
  */
 function submitPaymentReport(input) {
   assertSetup_();
+  if(!getUiConfig().payment_open)
+    throw new Error('Ban tổ chức đã tạm đóng chức năng báo chuyển khoản.');
   if (!input || typeof input!=='object') throw new Error('Thiếu thông tin.');
   const lock=LockService.getScriptLock();
   if(!lock.tryLock(20000)) throw new Error('Hệ thống đang bận, vui lòng thử lại.');
@@ -318,7 +416,12 @@ function getPublicLists() {
   assertSetup_();
   const ss=SpreadsheetApp.openById(CFG.spreadsheetId);
   const lists=collectLists_(ss);
-  return {...lists,updatedAt:new Date().toISOString()};
+  const uiConfig=readUiConfig_(ss);
+  // Không công bố số liệu thực thu khi người quản trị tắt phần tổng tiền.
+  if(!uiConfig.fund_totals && lists.stats) {
+    lists.stats={...lists.stats,plannedTotal:null,collectedTotal:null};
+  }
+  return {...lists,uiConfig,updatedAt:new Date().toISOString()};
 }
 
 /** Initialize registration tabs and immutable student IDs. Does not alter student names. */
