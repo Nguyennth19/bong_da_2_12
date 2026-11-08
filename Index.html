@@ -551,8 +551,14 @@
     document.querySelectorAll('[data-ui-feature]').forEach(el=>{
       const key=el.getAttribute('data-ui-feature');
       let visible=flags[key]!==false;
-      if(key==='registration_button') visible=visible&&canRegister;
-      if(key==='payment_button') visible=visible&&canReport;
+      // Nút phụ thuộc input bắt buộc: tự ẩn khi form không thể hoàn tất.
+      if(key==='registration_button') visible=visible&&canRegister
+        &&flags.registration!==false&&flags.participation!==false
+        &&flags.student_search!==false&&flags.size_picker!==false
+        &&flags.jersey_number!==false;
+      if(key==='payment_button') visible=visible&&canReport
+        &&flags.registration!==false&&flags.student_search!==false
+        &&flags.jersey_number!==false;
       el.classList.toggle('ui-hidden',!visible);
       if(!visible)el.setAttribute('aria-hidden','true');else el.removeAttribute('aria-hidden');
     });
