@@ -369,11 +369,22 @@
       .fund-totals>div{flex-wrap:wrap}
       .fund-totals strong{white-space:normal}
     }
+
+    /* Admin visibility is presentation only; backend independently enforces registration gates. */
+    .ui-hidden{display:none!important}
+    .payment-grid:has(.payment-panel-bank.ui-hidden){grid-template-columns:1fr}
+    .payment-grid:has(.payment-panel-fund.ui-hidden){grid-template-columns:1fr}
+    .jersey-layout:has(.jersey-photo.ui-hidden){grid-template-columns:1fr}
+    .jersey-layout:has(.jersey-details.ui-hidden){grid-template-columns:1fr}
+    .confirm-action-grid:has(.confirm-action.ui-hidden){grid-template-columns:1fr}
+    .tables:has(.table-card.ui-hidden){grid-template-columns:1fr}
+    .student-full.ui-hidden+.jersey-layout{margin-top:0}
+    @media(max-width:700px){.payment-grid,.jersey-layout,.tables{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
   <div class="container">
-    <header class="hero">
+    <header class="hero" data-ui-feature="hero">
       <div><span class="tag">LỚP 2/12 · NGÀY HỘI THỂ THAO</span><h1>ĐĂNG KÝ BÓNG ĐÁ & ÁO ĐẤU</h1><p>Thi đấu hết mình · Cổ vũ nhiệt tình</p></div>
       <div class="crest" aria-hidden="true">
         <img src="<?!= crestImage ?>" alt="" width="140" height="140" loading="eager" decoding="async"
@@ -383,7 +394,7 @@
     </header>
 
 
-    <section class="stats" aria-label="Thống kê">
+    <section class="stats" data-ui-feature="stats" aria-label="Thống kê">
       <div class="stat"><b id="countAthletes">0</b><span>Đăng ký tham gia thi đấu</span></div>
       <div class="stat"><b id="countConfirmed">0</b><span>Bé đã xác nhận tham gia</span></div>
       <div class="stat"><b id="countSupporters">0</b><span>Bộ áo cổ vũ</span></div>
@@ -392,7 +403,7 @@
 
 
     <!-- Module 1: full-width participation choices -->
-    <section class="card module role-card" id="module1" aria-labelledby="roleTitle">
+    <section class="card module role-card" data-ui-feature="participation" id="module1" aria-labelledby="roleTitle">
       <div class="module-header"><h2 id="roleTitle">Hình thức tham gia</h2></div>
       <p class="role-note">💡 Cả hai nhóm đều được đăng ký áo đấu. Chọn một hình thức tham gia để tiếp tục.</p>
       <div class="roles" role="group" aria-label="Hình thức tham gia">
@@ -406,9 +417,9 @@
     </section>
 
     <!-- Module 2: full-width student search; jersey image 1/3 + size and options 2/3 -->
-    <section class="card module registration-card" id="module2" aria-labelledby="registrationTitle">
+    <section class="card module registration-card" data-ui-feature="registration" id="module2" aria-labelledby="registrationTitle">
       <div class="module-header"><h2 id="registrationTitle">Thông tin học sinh & áo đấu</h2></div>
-      <div class="student-full">
+      <div class="student-full" data-ui-feature="student_search">
         <label for="studentSearch">Họ và tên học sinh <strong style="color:#e66c85">*</strong></label>
         <div class="searchbox">
           <input type="text" id="studentSearch" autocomplete="off" aria-autocomplete="list" aria-controls="suggestions" placeholder="Nhập họ tên đầy đủ hoặc một phần, ví dụ: Lịch Khê">
@@ -417,13 +428,13 @@
         <div class="selected" id="selectedName" aria-live="polite"></div>
       </div>
       <div class="jersey-layout">
-        <aside class="jersey-photo" aria-label="Mẫu áo đấu">
+        <aside class="jersey-photo" data-ui-feature="jersey_image" aria-label="Mẫu áo đấu">
           <img id="jerseyImage" src="<?!= jerseyImage ?>" alt="Mẫu áo đấu ao_dau.jpg của lớp 2/12" onerror="this.hidden=true;document.getElementById('jerseyImageError').hidden=false;">
           <p id="jerseyImageError" class="image-error" hidden>Chưa tải được ảnh áo đấu. Ban tổ chức kiểm tra quyền đọc file ao_dau.jpg trong Google Drive và triển khai lại ứng dụng.</p>
           <div class="jersey-caption"><b>MẪU ÁO ĐẤU CHÍNH THỨC</b><div class="price" id="price">150.000đ / bộ</div></div>
         </aside>
         <div class="jersey-details">
-          <div class="size-guide">
+          <div class="size-guide" data-ui-feature="size_chart">
             <h3>📏 Bảng size áo tham khảo</h3>
             <div class="size-table-wrap">
               <table class="size-chart" aria-label="Bảng size tham khảo">
@@ -435,17 +446,17 @@
               <img src="<?!= sizeImage ?>" alt="Ảnh bảng size áo trẻ em từ nhà cung cấp" onerror="this.hidden=true;">
             </details>
           </div>
-          <div class="size-picker">
+          <div class="size-picker" data-ui-feature="size_picker">
             <h3>👕 Chọn size áo đấu <strong style="color:#e66c85">*</strong></h3>
             <div class="sizes" id="sizeButtons" role="group" aria-label="Chọn size"></div>
             <div id="sizeSelected" class="size-selected" aria-live="polite"></div>
           </div>
           <div class="jersey-fields">
-            <div class="field">
+            <div class="field" data-ui-feature="jersey_number">
               <label for="jerseyNumber">Số áo đấu (0–99) <strong style="color:#e66c85">*</strong></label>
               <input type="number" min="0" max="99" step="1" id="jerseyNumber" placeholder="Ví dụ: 10" inputmode="numeric">
             </div>
-            <div class="field">
+            <div class="field" data-ui-feature="print_name">
               <label for="printName">Tên in trên áo <span class="optional">(không bắt buộc)</span></label>
               <input type="text" maxlength="40" id="printName" placeholder="Để trống sẽ tự lấy 2 từ cuối họ tên">
             </div>
@@ -455,12 +466,12 @@
     </section>
 
     <!-- Quỹ bóng đá: 2 cột chi phí & chuyển khoản, ngay sau header. -->
-    <section class="card payment-module" aria-label="Thông tin thu quỹ và chuyển khoản">
+    <section class="card payment-module" data-ui-feature="fund" aria-label="Thông tin thu quỹ và chuyển khoản">
       <div class="payment-grid">
         <div class="payment-panel payment-panel-fund">
           <div class="payment-heading"><span class="payment-icon" aria-hidden="true">⚽</span><h2>Thông tin thu quỹ Bóng đá</h2></div>
           <p class="payment-lead">Số tiền dự định thu <strong>1.000.000đ/bé</strong></p>
-          <div class="payment-fees">
+          <div class="payment-fees" data-ui-feature="fund_details">
             <div class="payment-fee"><span>👕 Áo đấu</span><strong>150.000đ / bộ</strong></div>
             <div class="payment-fee"><span>🏟️ Thuê sân tập + HLV HDF<small class="fee-sub">4 buổi tập</small></span><strong>7.000.000đ / 4 buổi</strong></div>
             <div class="payment-fee"><span>🏆 Chi phí khác: Nước uống, ăn nhẹ<small class="fee-sub">4 buổi tập + tối thiểu 3 trận đấu</small></span><strong>300.000đ / trận</strong></div>
@@ -469,13 +480,13 @@
             <p><span aria-hidden="true">✨</span> Khoản dư sau giải sẽ được hoàn trả hoặc mua quà kỷ niệm cho bé.</p>
             <p><span aria-hidden="true">📣</span> Phụ huynh đăng ký áo đấu để <b>cổ vũ chỉ đóng 150.000đ / bộ.</b></p>
           </div>
-          <div class="fund-totals" aria-live="polite">
+          <div class="fund-totals" data-ui-feature="fund_totals" aria-live="polite">
             <div><span>Tổng tiền dự kiến</span><strong id="plannedTotal">0đ</strong></div>
             <div><span>Tổng tiền thực thu (đã đối soát)</span><strong id="collectedTotal">0đ</strong></div>
           </div>
         </div>
 
-        <div class="payment-panel payment-panel-bank">
+        <div class="payment-panel payment-panel-bank" data-ui-feature="bank">
           <div class="payment-heading"><span class="payment-icon" aria-hidden="true">🏦</span><h2>Thông tin chuyển khoản</h2></div>
           <div class="bank-facts">
             <div><span class="bank-label">Tên tài khoản</span><strong><?= bankAccountName ?></strong></div>
@@ -484,7 +495,7 @@
           </div>
           <div class="bank-transfer-label">Nội dung chuyển khoản</div>
           <div class="bank-reference" id="paymentReference" aria-live="polite">[Tên bé] - Lớp 2/12 - Đóng quỹ bóng đá</div>
-          <div class="payment-qr-area">
+          <div class="payment-qr-area" data-ui-feature="bank_qr">
             <img id="paymentQrSource" class="payment-qr-source" src="<?!= paymentQrImage ?>" alt="" aria-hidden="true">
             <canvas id="paymentQrCanvas" class="payment-qr-canvas" width="924" height="1012" role="img"
               aria-label="Mã QR VPBank để quét chuyển khoản"></canvas>
@@ -499,11 +510,11 @@
     <!-- Module 3: full-width confirmation -->
     <section class="confirm-card" id="module3" aria-label="Xác nhận đăng ký và chuyển khoản">
       <div class="confirm-action-grid">
-        <div class="confirm-action">
+        <div class="confirm-action" data-ui-feature="registration_button">
           <button type="button" class="primary" id="submitBtn">✓ Xác nhận đăng ký</button>
           <p class="submit-help" id="submissionHelp">Lưu lựa chọn thi đấu/cổ vũ, size và số áo.</p>
         </div>
-        <div class="confirm-action">
+        <div class="confirm-action" data-ui-feature="payment_button">
           <button type="button" class="primary payment-confirm-btn" id="paymentBtn">✓ Xác nhận đã đóng tiền</button>
           <p class="submit-help" id="paymentHelp">Báo đã chuyển khoản; ban tổ chức sẽ kiểm tra và đánh dấu đã thu.</p>
         </div>
@@ -512,15 +523,15 @@
     </section>
 
     <section class="tables">
-      <div class="card table-card">
+      <div class="card table-card" data-ui-feature="athletes_list">
         <div class="table-header"><div><h2>Danh sách thi đấu</h2><div class="sub">Chỉ những bé đã chọn “Thi đấu”</div></div>
           <button type="button" class="muted-btn" id="printAthletes">🖨 In danh sách</button></div>
         <div class="table-wrap"><table><thead><tr><th>STT</th><th>Họ tên học sinh</th><th>Số áo</th></tr></thead><tbody id="athletesBody"><tr><td colspan="3" class="empty">Đang tải...</td></tr></tbody></table></div>
       </div>
-      <div class="card table-card order-card">
+      <div class="card table-card order-card" data-ui-feature="orders_list">
         <div class="table-header"><div><h2>Danh sách đặt áo</h2><div class="sub">Bao gồm bé thi đấu và bé cổ vũ</div></div>
           <button type="button" class="muted-btn" id="printOrders">🖨 In đơn áo</button></div>
-        <div class="table-wrap"><table><thead><tr><th>STT</th><th>Họ tên</th><th>Tên in áo</th><th>Size</th><th>Số áo</th><th>Vai trò</th><th>Đã đóng</th></tr></thead><tbody id="ordersBody"><tr><td colspan="7" class="empty">Đang tải...</td></tr></tbody></table></div>
+        <div class="table-wrap"><table><thead><tr><th>STT</th><th>Họ tên</th><th>Tên in áo</th><th>Size</th><th>Số áo</th><th>Vai trò</th><th data-ui-feature="paid_column">Đã đóng</th></tr></thead><tbody id="ordersBody"><tr><td colspan="7" class="empty">Đang tải...</td></tr></tbody></table></div>
       </div>
     </section>
     <footer class="footer">Thông tin đăng ký dành cho phụ huynh lớp 2/12. Không chia sẻ đường link ra ngoài nhóm lớp.</footer>
@@ -530,7 +541,40 @@
   'use strict';
   const $=id=>document.getElementById(id);
   let selected=null,role='',size='',results=[],lists={athletes:[],orders:[]},editToken='',busy=false,searchTimer=0,searchSequence=0;
-  let listRevision=0,pollInFlight=false;
+  let listRevision=0,pollInFlight=false,currentUiConfig=null;
+  // Controls from Google Sheets. Missing flags remain visible (fail-open for old builds).
+  function applyUiConfig(flags){
+    if(!flags || typeof flags!=='object')return;
+    currentUiConfig=flags;
+    const canRegister=flags.registration_open!==false;
+    const canReport=flags.payment_open!==false;
+    document.querySelectorAll('[data-ui-feature]').forEach(el=>{
+      const key=el.getAttribute('data-ui-feature');
+      let visible=flags[key]!==false;
+      // Nút phụ thuộc input bắt buộc: tự ẩn khi form không thể hoàn tất.
+      if(key==='registration_button') visible=visible&&canRegister
+        &&flags.registration!==false&&flags.participation!==false
+        &&flags.student_search!==false&&flags.size_picker!==false
+        &&flags.jersey_number!==false;
+      if(key==='payment_button') visible=visible&&canReport
+        &&flags.registration!==false&&flags.student_search!==false
+        &&flags.jersey_number!==false;
+      el.classList.toggle('ui-hidden',!visible);
+      if(!visible)el.setAttribute('aria-hidden','true');else el.removeAttribute('aria-hidden');
+    });
+    // Tắt toàn bộ hàng action khi hai nút bị ẩn; thông báo vẫn còn trong DOM.
+    const first=document.querySelector('[data-ui-feature="registration_button"]');
+    const second=document.querySelector('[data-ui-feature="payment_button"]');
+    const actions=document.getElementById('module3');
+    if(actions && first && second) actions.classList.toggle('ui-hidden',
+      first.classList.contains('ui-hidden')&&second.classList.contains('ui-hidden'));
+    // Nếu chỉ để xem danh sách, không nên còn control thao tác.
+    const status=$('submissionHelp');
+    if(status && !canRegister)status.textContent='Ban tổ chức đang tạm đóng đăng ký.';
+    const payStatus=$('paymentHelp');
+    if(payStatus && !canReport)payStatus.textContent='Ban tổ chức đang tạm đóng báo chuyển khoản.';
+  }
+
   const formatMoney=n=>Number(n).toLocaleString('vi-VN')+'đ';
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const lastTwo=s=>String(s||'').trim().split(/\s+/).filter(Boolean).slice(-2).join(' ');
@@ -587,6 +631,7 @@
   }
   function renderLists(data){
     lists=data||{athletes:[],orders:[]};
+    if(lists.uiConfig)applyUiConfig(lists.uiConfig);
     const stats=lists.stats||{};
     $('countAthletes').textContent=stats.athletes??lists.athletes.length;
     $('countConfirmed').textContent=stats.confirmed??0;
@@ -600,7 +645,8 @@
     $('ordersBody').innerHTML=lists.orders.length?lists.orders.map(r=>
       '<tr><td>'+r.stt+'</td><td>'+esc(r.name)+'</td>'+
       '<td>'+esc(r.printName)+'</td><td>'+esc(r.size)+'</td><td>'+esc(r.number)+'</td>'+
-      '<td>'+esc(r.role)+'</td><td class="paid-cell"><span class="paid-check '+(r.paid?'is-paid':(r.paymentReported?'is-reported':''))+'" '+
+      '<td>'+esc(r.role)+'</td><td class="paid-cell '+(currentUiConfig&&currentUiConfig.paid_column===false?'ui-hidden':'')+'" '+
+      'data-ui-feature="paid_column"><span class="paid-check '+(r.paid?'is-paid':(r.paymentReported?'is-reported':''))+'" '+
       'aria-label="'+(r.paid?'Đã xác nhận thu tiền':(r.paymentReported?'Phụ huynh báo đã chuyển, chờ đối soát':'Chưa báo chuyển khoản'))+'">'+(r.paid?'✓':'')+'</span></td></tr>').join(''):
       '<tr><td colspan="7" class="empty">Chưa có đơn đặt áo</td></tr>';
   }
@@ -739,8 +785,11 @@
   });
   function printTable(type){
     const athlete=type==='athletes';
-    const headers=athlete?['STT','Họ và tên','Số áo']:['STT','Họ và tên','Tên in áo','Size','Số áo','Hình thức','Đã đóng'];
-    const keys=athlete?['stt','name','number']:['stt','name','printName','size','number','role','paid'];
+    const displayPaid=!currentUiConfig || currentUiConfig.paid_column!==false;
+    const headers=athlete?['STT','Họ và tên','Số áo']:
+      ['STT','Họ và tên','Tên in áo','Size','Số áo','Hình thức'].concat(displayPaid?['Đã đóng']:[]);
+    const keys=athlete?['stt','name','number']:
+      ['stt','name','printName','size','number','role'].concat(displayPaid?['paid']:[]);
     const records=lists[type];const title=athlete?'DANH SÁCH THAM GIA THI ĐẤU':'DANH SÁCH ĐẶT ÁO ĐẤU';
     const w=window.open('','_blank');if(!w)return message('Trình duyệt đang chặn cửa sổ in. Hãy cho phép pop-up rồi thử lại.','error');
     w.document.open();
@@ -754,6 +803,7 @@
   $('printAthletes').addEventListener('click',()=>printTable('athletes'));
   $('printOrders').addEventListener('click',()=>printTable('orders'));
   server('getInitialData',[],data=>{
+    applyUiConfig(data.uiConfig);
     $('price').textContent=formatMoney(data.price)+' / bộ';
     renderChart(data.chart);renderLists(data.lists);
   });
